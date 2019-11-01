@@ -1,8 +1,8 @@
 package fibonacci
 
 import (
-	"goContainer"
 	"goContainer/heap"
+	"goContainer/utils"
 	"math"
 	"strconv"
 	"testing"
@@ -151,7 +151,7 @@ func TestHeap(t *testing.T) {
 func BenchmarkHeap_Insert(b *testing.B) {
 	data := make([]item, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = item(container.GenerateRandomInt())
+		data[i] = item(utils.GenerateRandomInt())
 	}
 	b.ResetTimer()
 
@@ -165,7 +165,7 @@ func BenchmarkHeap_Insert(b *testing.B) {
 func BenchmarkHeap_DeleteMin(b *testing.B) {
 	data := make([]item, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = item(container.GenerateRandomInt())
+		data[i] = item(utils.GenerateRandomInt())
 	}
 
 	h := NewHeap()
@@ -187,7 +187,7 @@ func BenchmarkHeap(b *testing.B) {
 
 		rn := 0
 		for i := 0; i < n; i++ {
-			rn = container.GenerateRandomInt()
+			rn = utils.GenerateRandomInt()
 			h.Insert(item(rn))
 		}
 

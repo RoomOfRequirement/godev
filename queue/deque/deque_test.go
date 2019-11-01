@@ -3,6 +3,7 @@ package deque
 import (
 	"fmt"
 	"goContainer"
+	"goContainer/utils"
 	"math"
 	"strconv"
 	"testing"
@@ -131,7 +132,7 @@ func TestDeque(t *testing.T) {
 func BenchmarkDeque_PushBack(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 	b.ResetTimer()
 
@@ -145,7 +146,7 @@ func BenchmarkDeque_PushBack(b *testing.B) {
 func BenchmarkDeque_PushFront(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 	b.ResetTimer()
 
@@ -159,7 +160,7 @@ func BenchmarkDeque_PushFront(b *testing.B) {
 func BenchmarkDeque_PopFront(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 	dq := NewDeque(b.N)
 	for i := 0; i < b.N; i++ {
@@ -176,7 +177,7 @@ func BenchmarkDeque_PopFront(b *testing.B) {
 func BenchmarkDeque_PopBack(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 	dq := NewDeque(b.N)
 	for i := 0; i < b.N; i++ {
@@ -193,7 +194,7 @@ func BenchmarkDeque_PopBack(b *testing.B) {
 func BenchmarkDeque_Front(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 	dq := NewDeque(b.N)
 	for i := 0; i < b.N; i++ {
@@ -210,7 +211,7 @@ func BenchmarkDeque_Front(b *testing.B) {
 func BenchmarkDeque_Back(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 	dq := NewDeque(b.N)
 	for i := 0; i < b.N; i++ {
@@ -231,10 +232,10 @@ func BenchmarkDeque(b *testing.B) {
 			dq := NewDeque(n)
 			rn := 0
 			for i := 0; i < n; i++ {
-				rn = container.GenerateRandomInt()
+				rn = utils.GenerateRandomInt()
 				dq.PushBack(rn)
 			}
-			num := container.GenerateRandomInt()
+			num := utils.GenerateRandomInt()
 			b.ResetTimer()
 			for i := 1; i < b.N; i++ {
 				_, _ = dq.PopBack()
@@ -246,10 +247,10 @@ func BenchmarkDeque(b *testing.B) {
 			dq := NewDeque(n)
 			rn := 0
 			for i := 0; i < n; i++ {
-				rn = container.GenerateRandomInt()
+				rn = utils.GenerateRandomInt()
 				dq.PushBack(rn)
 			}
-			num := container.GenerateRandomInt()
+			num := utils.GenerateRandomInt()
 			b.ResetTimer()
 			for i := 1; i < b.N; i++ {
 				_, _ = dq.PopFront()
@@ -261,7 +262,7 @@ func BenchmarkDeque(b *testing.B) {
 			dq := NewDeque(n)
 			rn := 0
 			for i := 0; i < n; i++ {
-				rn = container.GenerateRandomInt()
+				rn = utils.GenerateRandomInt()
 				dq.PushBack(rn)
 			}
 			b.ResetTimer()
@@ -275,7 +276,7 @@ func BenchmarkDeque(b *testing.B) {
 			dq := NewDeque(n)
 			rn := 0
 			for i := 0; i < n; i++ {
-				rn = container.GenerateRandomInt()
+				rn = utils.GenerateRandomInt()
 				dq.PushBack(rn)
 			}
 			b.ResetTimer()
@@ -289,7 +290,7 @@ func BenchmarkDeque(b *testing.B) {
 			dq := NewDeque(n)
 			rn := 0
 			for i := 0; i < n; i++ {
-				rn = container.GenerateRandomInt()
+				rn = utils.GenerateRandomInt()
 				dq.PushBack(rn)
 			}
 			b.ResetTimer()
@@ -302,7 +303,7 @@ func BenchmarkDeque(b *testing.B) {
 			dq := NewDeque(n)
 			rn := 0
 			for i := 0; i < n; i++ {
-				rn = container.GenerateRandomInt()
+				rn = utils.GenerateRandomInt()
 				dq.PushBack(rn)
 			}
 			b.ResetTimer()

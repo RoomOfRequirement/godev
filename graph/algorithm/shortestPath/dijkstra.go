@@ -10,7 +10,7 @@ import (
 
 // Dijkstra algorithm
 //	https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
-//	use priority queue (minimum heap) (fibonacci heap: https://github.com/Harold2017/golina/tree/master/container/queue/prque/pqfibo)
+//	use priority queue (minimum heap) (fibonacci heap: https://github.com/Harold2017/goContainer/tree/master/queue/prque/pqfibo)
 func Dijkstra(g graph.Graph, source, target graph.ID) ([]graph.ID, map[graph.ID]float64, error) {
 	// Q (dist queue): set of all vertices
 	Q := newPQFib()

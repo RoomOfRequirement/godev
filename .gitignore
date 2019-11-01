@@ -233,3 +233,7 @@ dmypy.json
 
 # idea
 .idea/*
+
+# gnuplot
+_gnuplot
+.dat

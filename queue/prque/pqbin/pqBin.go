@@ -5,7 +5,7 @@ import (
 )
 
 // PQBin priority queue based on binary heap, implements golang heap.Interface (Sort.Interface)
-//	https://github.com/Harold2017/golina/tree/master/container/heap/bheap
+//	https://github.com/Harold2017/goContainer/tree/master/heap/bheap
 type PQBin struct {
 	items *bheap.MaxHeap
 }

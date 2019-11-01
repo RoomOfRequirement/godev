@@ -3,6 +3,7 @@ package bstree
 import (
 	"goContainer"
 	"goContainer/tree"
+	"goContainer/utils"
 	"testing"
 )
 
@@ -202,7 +203,7 @@ func BenchmarkBSTree_Insert(b *testing.B) {
 	bst.Comparator = container.IntComparator
 	data := make([]int, b.N)
 	for i := 0; i < b.N; i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 
 	b.ResetTimer()

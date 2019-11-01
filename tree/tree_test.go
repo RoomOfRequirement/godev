@@ -5,6 +5,7 @@ import (
 	"goContainer/heap/bheap"
 	"goContainer/tree/btree"
 	"goContainer/tree/rbtree"
+	"goContainer/utils"
 	"testing"
 )
 
@@ -81,7 +82,7 @@ func BenchmarkTree_InsertOne(b *testing.B) {
 		rbTree.Comparator = container.IntComparator
 		data := make([]int, b.N)
 		for i := 0; i < b.N; i++ {
-			data[i] = container.GenerateRandomInt()
+			data[i] = utils.GenerateRandomInt()
 		}
 
 		b.ResetTimer()
@@ -96,7 +97,7 @@ func BenchmarkTree_InsertOne(b *testing.B) {
 		minH.Init()
 		data := make([]int, b.N)
 		for i := 0; i < b.N; i++ {
-			data[i] = container.GenerateRandomInt()
+			data[i] = utils.GenerateRandomInt()
 		}
 
 		b.ResetTimer()
@@ -109,7 +110,7 @@ func BenchmarkTree_InsertOne(b *testing.B) {
 		bTree := btree.NewBTree(10, container.IntComparator)
 		data := make([]int, b.N)
 		for i := 0; i < b.N; i++ {
-			data[i] = container.GenerateRandomInt()
+			data[i] = utils.GenerateRandomInt()
 		}
 
 		b.ResetTimer()

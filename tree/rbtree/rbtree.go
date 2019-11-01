@@ -60,9 +60,8 @@ func (node *Node) uncle() *Node {
 func (node *Node) sibling() *Node {
 	if node.parent.leftTree == node {
 		return node.parent.rightTree
-	} else {
-		return node.parent.leftTree
 	}
+	return node.parent.leftTree
 }
 
 // in-order
@@ -143,6 +142,7 @@ func (rbTree *RBTree) MinValue() interface{} {
 	return rbTree.minValue(rbTree.Root)
 }
 
+// NewRBTree creates a new red-black tree
 func NewRBTree(root *Node, comparator container.Comparator) *RBTree {
 	rbTree := &RBTree{Root: root, Comparator: comparator}
 	rbTree.Root.color = Black

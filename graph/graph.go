@@ -1,17 +1,17 @@
 package graph
 
-// ID: generic interface for any id
+// ID generic interface for any id
 type ID interface {
 	String() string
 }
 
-// Node: generic interface for node or vertex in graph
+// Node generic interface for node or vertex in graph
 type Node interface {
 	ID() ID
 	String() string
 }
 
-// Edge: edge includes two nodes (source, target) and its corresponding weight from source points to target
+// Edge edge includes two nodes (source, target) and its corresponding weight from source points to target
 type Edge interface {
 	Source() Node
 	Target() Node
@@ -19,7 +19,7 @@ type Edge interface {
 	String() string
 }
 
-// EdgeSlice: for sorting
+// EdgeSlice for sorting
 type EdgeSlice []Edge
 
 func (es EdgeSlice) Len() int {
@@ -34,7 +34,7 @@ func (es EdgeSlice) Swap(i, j int) {
 	es[i], es[j] = es[j], es[i]
 }
 
-// Graph: generic interface for using hash-map to store nodes to avoid duplicates
+// Graph generic interface for using hash-map to store nodes to avoid duplicates
 type Graph interface {
 	NodeNum() int
 	EdgeNum() int

@@ -6,7 +6,7 @@ import (
 )
 
 // PQFib priority queue based on fibonacci heap
-//	https://github.com/Harold2017/golina/tree/master/container/heap/fibonacci
+//	https://github.com/Harold2017/goContainer/tree/master/heap/fibonacci
 type PQFib struct {
 	items *fibonacci.Heap
 }

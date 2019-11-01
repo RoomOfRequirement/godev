@@ -2,7 +2,7 @@ package graph
 
 import (
 	"fmt"
-	"goContainer"
+	"goContainer/utils"
 	"math"
 	"strconv"
 	"testing"
@@ -149,10 +149,10 @@ func BenchmarkGraph_Node(b *testing.B) {
 
 		graph := NewGraph()
 		for i := 0; i < n; i++ {
-			graph.AddNode(NewNode(container.GenerateRandomString(100)))
+			graph.AddNode(NewNode(utils.GenerateRandomString(100)))
 		}
 
-		s := container.GenerateRandomString(10)
+		s := utils.GenerateRandomString(10)
 		b.ResetTimer()
 		b.Run("Add-One when size-"+strconv.Itoa(n), func(b *testing.B) {
 			for i := 1; i < b.N; i++ {

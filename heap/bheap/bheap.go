@@ -5,7 +5,7 @@ import (
 	"goContainer"
 )
 
-// Heap: use heap interface from "container/heap"
+// Heap use heap interface from "container/heap"
 type Heap struct {
 	values     []interface{}
 	comparator container.Comparator

@@ -157,7 +157,7 @@ func (g *graph) AddEdge(idSource, idTarget ID, weight float64) error {
 	}
 
 	if _, existed := g.edges[idSource]; existed {
-		if _, existed_ := g.edges[idSource][idTarget]; existed_ {
+		if _, _existed := g.edges[idSource][idTarget]; _existed {
 			// if edge existed, just update weight by adding
 			g.edges[idSource][idTarget] += weight
 		} else {
@@ -214,11 +214,11 @@ func (g *graph) GetEdge(idSource, idTarget ID) (Edge, error) {
 	if _, existed := g.GetNode(idTarget); !existed {
 		return nil, NodeNotExistError(idSource)
 	}
-	if weight, existed := g.edges[idSource][idTarget]; !existed {
+	weight, existed := g.edges[idSource][idTarget]
+	if !existed {
 		return nil, EdgeNotExistError(idSource, idTarget)
-	} else {
-		return NewEdge(g.nodes[idSource], g.nodes[idTarget], weight), nil
 	}
+	return NewEdge(g.nodes[idSource], g.nodes[idTarget], weight), nil
 }
 
 func (g *graph) GetNodes() map[ID]Node {

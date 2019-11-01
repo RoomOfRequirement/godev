@@ -3,6 +3,7 @@ package pqbin
 import (
 	"fmt"
 	"goContainer"
+	"goContainer/utils"
 	"math"
 	"strconv"
 	"testing"
@@ -56,7 +57,7 @@ func TestPQBin(t *testing.T) {
 func BenchmarkPQBin_Push(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 	b.ResetTimer()
 
@@ -70,7 +71,7 @@ func BenchmarkPQBin_Push(b *testing.B) {
 func BenchmarkPQBin_Pop(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 	queue := NewPQBin()
 	for i := 0; i < len(data); i++ {
@@ -90,10 +91,10 @@ func BenchmarkPQBin(b *testing.B) {
 		pq := NewPQBin()
 		rn := 0
 		for i := 0; i < n; i++ {
-			rn = container.GenerateRandomInt()
+			rn = utils.GenerateRandomInt()
 			pq.Push(rn, rn)
 		}
-		num := container.GenerateRandomInt()
+		num := utils.GenerateRandomInt()
 		b.ResetTimer()
 
 		b.Run("PQBin Push: size-"+strconv.Itoa(n), func(b *testing.B) {

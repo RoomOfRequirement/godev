@@ -6,7 +6,7 @@ import (
 )
 
 // DequeRW is implemented on top of deque
-//	see it in `https://github.com/Harold2017/golina/tree/master/container/queue/deque`
+//	see it in `https://github.com/Harold2017/goContainer/tree/master/queue/deque`
 type DequeRW struct {
 	dq   *deque.Deque
 	lock sync.RWMutex

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"goContainer"
 	"goContainer/tree"
+	"goContainer/utils"
 	"strconv"
 	"testing"
 )
@@ -68,7 +69,7 @@ func BenchmarkBTree_Insert(b *testing.B) {
 	bTree := NewBTree(10, container.IntComparator)
 	data := make([]int, b.N)
 	for i := 0; i < b.N; i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 
 	b.ResetTimer()

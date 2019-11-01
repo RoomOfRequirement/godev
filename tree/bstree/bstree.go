@@ -5,7 +5,7 @@ import (
 	"goContainer"
 )
 
-// BSTree: Binary Search Tree
+// BSTree Binary Search Tree
 //	http://cslibrary.stanford.edu/110/BinaryTrees.html
 type BSTree struct {
 	Root       *Node
@@ -39,17 +39,17 @@ func NewNode(data interface{}) *Node {
 func (bst *BSTree) lookup(node *Node, target interface{}) bool {
 	if node == nil {
 		return false
-	} else {
-		switch bst.Comparator(target, node.data) {
-		case 0:
-			return true
-		case -1:
-			return bst.lookup(node.left, target)
-		case 1:
-			return bst.lookup(node.right, target)
-		default:
-			return false
-		}
+	}
+
+	switch bst.Comparator(target, node.data) {
+	case 0:
+		return true
+	case -1:
+		return bst.lookup(node.left, target)
+	case 1:
+		return bst.lookup(node.right, target)
+	default:
+		return false
 	}
 }
 
@@ -61,15 +61,15 @@ func (bst *BSTree) Lookup(target interface{}) bool {
 func (bst *BSTree) insert(node *Node, data interface{}) *Node {
 	if node == nil {
 		return NewNode(data)
-	} else {
-		switch bst.Comparator(data, node.data) {
-		case -1, 0:
-			node.left = bst.insert(node.left, data)
-		case 1:
-			node.right = bst.insert(node.right, data)
-		}
-		return node
 	}
+
+	switch bst.Comparator(data, node.data) {
+	case -1, 0:
+		node.left = bst.insert(node.left, data)
+	case 1:
+		node.right = bst.insert(node.right, data)
+	}
+	return node
 }
 
 // Insert inserts data into the tree
@@ -100,9 +100,8 @@ func (bst *BSTree) Empty() bool {
 func (bst *BSTree) size(node *Node) int {
 	if node == nil {
 		return 0
-	} else {
-		return bst.size(node.left) + 1 + bst.size(node.right)
 	}
+	return bst.size(node.left) + 1 + bst.size(node.right)
 }
 
 // Size returns the number of nodes inside the tree
@@ -137,15 +136,13 @@ func (bst *BSTree) Clear() {
 func (bst *BSTree) maxDepth(node *Node) int {
 	if node == nil {
 		return 0
-	} else {
-		lDepth := bst.maxDepth(node.left)
-		rDepth := bst.maxDepth(node.right)
-		if lDepth > rDepth {
-			return lDepth + 1
-		} else {
-			return rDepth + 1
-		}
 	}
+	lDepth := bst.maxDepth(node.left)
+	rDepth := bst.maxDepth(node.right)
+	if lDepth > rDepth {
+		return lDepth + 1
+	}
+	return rDepth + 1
 }
 
 // MaxDepth returns the tree height
@@ -169,10 +166,9 @@ func (bst *BSTree) MinValue() interface{} {
 func (bst *BSTree) hasPathSum(node *Node, sum interface{}) bool {
 	if node == nil {
 		return sum == 0
-	} else {
-		sum = bst.Diffidence(sum, node.data)
-		return bst.hasPathSum(node.left, sum) || bst.hasPathSum(node.right, sum)
 	}
+	sum = bst.Diffidence(sum, node.data)
+	return bst.hasPathSum(node.left, sum) || bst.hasPathSum(node.right, sum)
 }
 
 // HasPathSum returns true if there's one path to get the input sum by summing up all values along this path
@@ -199,7 +195,7 @@ func (bst *BSTree) printPaths(node *Node, path []interface{}) {
 	}
 }
 
-// all root to leaf paths
+// PrintPaths print all paths from root to leaf
 func (bst *BSTree) PrintPaths() {
 	var paths []interface{}
 	bst.printPaths(bst.Root, paths)
@@ -244,9 +240,8 @@ func (bst *BSTree) sameTree(nodeA, nodeB *Node) bool {
 		return true
 	} else if nodeA != nil && nodeB != nil {
 		return nodeA.data == nodeB.data && bst.sameTree(nodeA.left, nodeB.left) && bst.sameTree(nodeA.right, nodeB.right)
-	} else {
-		return false
 	}
+	return false
 }
 
 // SameTree returns true if both trees are made of nodes with the same values
@@ -258,17 +253,16 @@ func (bst *BSTree) SameTree(bstB *BSTree) bool {
 func CountTrees(numKeys int) int {
 	if numKeys <= 1 {
 		return 1
-	} else {
-		sum, left, right := 0, 0, 0
-		for root := 0; root < numKeys; root++ {
-			// left tree node num
-			left = CountTrees(root)
-			// right tree node num
-			right = CountTrees(numKeys - 1 - root)
-			sum += left * right
-		}
-		return sum
 	}
+	sum, left, right := 0, 0, 0
+	for root := 0; root < numKeys; root++ {
+		// left tree node num
+		left = CountTrees(root)
+		// right tree node num
+		right = CountTrees(numKeys - 1 - root)
+		sum += left * right
+	}
+	return sum
 }
 
 func (bst *BSTree) isBST(node *Node, min, max interface{}) bool {

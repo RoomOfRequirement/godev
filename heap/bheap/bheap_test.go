@@ -2,6 +2,7 @@ package bheap
 
 import (
 	"goContainer"
+	"goContainer/utils"
 	"math"
 	"strconv"
 	"testing"
@@ -68,7 +69,7 @@ func TestHeap(t *testing.T) {
 func BenchmarkHeap_Push(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 
 	minH := new(MinHeap)
@@ -85,7 +86,7 @@ func BenchmarkHeap_Push(b *testing.B) {
 func BenchmarkHeap_Pop(b *testing.B) {
 	data := make([]int, b.N)
 	for i := 0; i < len(data); i++ {
-		data[i] = container.GenerateRandomInt()
+		data[i] = utils.GenerateRandomInt()
 	}
 
 	minH := new(MinHeap)
@@ -112,11 +113,11 @@ func BenchmarkHeap(b *testing.B) {
 
 		rn := 0
 		for i := 0; i < n; i++ {
-			rn = container.GenerateRandomInt()
+			rn = utils.GenerateRandomInt()
 			minH.Push(rn)
 		}
 
-		num := container.GenerateRandomInt()
+		num := utils.GenerateRandomInt()
 
 		b.ResetTimer()
 

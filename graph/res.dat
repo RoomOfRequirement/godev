@@ -1,0 +1,7 @@
+# Gnuplot script file for "res"
+# size     heap     red-black-tree     b-tree     graph
+10         141      468                96         91
+100        127      501                125        95
+1000       118      525                152        92
+10000      102      637                185        105
+100000     113      946                223        109
