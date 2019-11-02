@@ -108,7 +108,7 @@ func (st *SplayTree) zag(x *node) {
 }
 
 /*
-ggp (x.parent.parent) / gp (x.parent.parent) / p (x.parent)
+ggp (x.parent.parent.parent) / gp (x.parent.parent) / p (x.parent)
 zigzig: left left case (x is left child's left child)
 right rotate (gp) ----->  right rotate (p)
         ggp (1. ggp is nil / 2. gp is left child of ggp / 3. gp is right child of ggp)
@@ -153,7 +153,7 @@ func (st *SplayTree) zigzig(x *node) {
 }
 
 /*
-ggp (x.parent.parent) / gp (x.parent.parent) / p (x.parent)
+ggp (x.parent.parent.parent) / gp (x.parent.parent) / p (x.parent)
 zagzag: right right case (x is right child's right child)
 left rotate (gp) ----->  left rotate (p)
         ggp (1. ggp is nil / 2. gp is left child of ggp / 3. gp is right child of ggp)
@@ -198,7 +198,7 @@ func (st *SplayTree) zagzap(x *node) {
 }
 
 /*
-ggp (x.parent.parent) / gp (x.parent.parent) / p (x.parent)
+ggp (x.parent.parent.parent) / gp (x.parent.parent) / p (x.parent)
 zigzag: right left case (x is right child's left child)
 right rotate (p) ----->  left rotate (x)
         ggp (1. ggp is nil / 2. gp is left child of ggp / 3. gp is right child of ggp)
@@ -243,7 +243,7 @@ func (st *SplayTree) zigzag(x *node) {
 }
 
 /*
-ggp (x.parent.parent) / gp (x.parent.parent) / p (x.parent)
+ggp (x.parent.parent.parent) / gp (x.parent.parent) / p (x.parent)
 zagzig: left right case (x is left child's right child)
 left rotate (x) ----->  right rotate (g)
         ggp (1. ggp is nil / 2. gp is left child of ggp / 3. gp is right child of ggp)
