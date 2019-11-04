@@ -15,6 +15,7 @@ const (
 
 // Node struct
 type Node struct {
+	key                         interface{}
 	value                       interface{}
 	color                       bool
 	leftTree, rightTree, parent *Node
@@ -22,6 +23,7 @@ type Node struct {
 
 // NIL represents nil Node, which used for finding leaf
 var NIL = &Node{
+	key:       nil,
 	value:     nil,
 	color:     Black,
 	leftTree:  nil,
@@ -29,9 +31,10 @@ var NIL = &Node{
 	parent:    nil,
 }
 
-// NewNode creates a new Node from value
-func NewNode(value interface{}) *Node {
+// NewNode creates a new Node from key
+func NewNode(key, value interface{}) *Node {
 	return &Node{
+		key:       key,
 		value:     value,
 		color:     Red,
 		leftTree:  nil,
@@ -64,7 +67,7 @@ func (node *Node) sibling() *Node {
 	return node.parent.leftTree
 }
 
-// in-order
+// String returns node list in-order
 func (node *Node) String() string {
 	if node == NIL {
 		return "NIL"
@@ -77,7 +80,7 @@ func (node *Node) String() string {
 	if node.color {
 		c = "Black"
 	}
-	s += fmt.Sprintf("%v(%s)", node.value, c)
+	s += fmt.Sprintf("%v(%s)", node.key, c)
 	if node.rightTree != nil {
 		s += " " + node.rightTree.String()
 	}
@@ -90,12 +93,13 @@ type RBTree struct {
 	Comparator container.Comparator
 }
 
+// String returns nodes in rbTree, not pretty, need improved
 func (rbTree *RBTree) String() string {
 	return fmt.Sprintf("%s", rbTree.Root)
 }
 
 func (rbTree *RBTree) value(node *Node, dataSlice *[]interface{}) {
-	if node.value == nil {
+	if node.key == nil {
 		return
 	}
 	rbTree.value(node.leftTree, dataSlice)
@@ -104,6 +108,7 @@ func (rbTree *RBTree) value(node *Node, dataSlice *[]interface{}) {
 }
 
 // Values returns values of all nodes inside the tree
+//	notice: values follows keys' order!
 func (rbTree *RBTree) Values() []interface{} {
 	if rbTree.Root == nil {
 		return nil
@@ -111,6 +116,25 @@ func (rbTree *RBTree) Values() []interface{} {
 	var values []interface{}
 	rbTree.value(rbTree.Root, &values)
 	return values
+}
+
+func (rbTree *RBTree) key(node *Node, dataSlice *[]interface{}) {
+	if node.key == nil {
+		return
+	}
+	rbTree.key(node.leftTree, dataSlice)
+	*dataSlice = append(*dataSlice, node.key)
+	rbTree.key(node.rightTree, dataSlice)
+}
+
+// Keys returns keys of all nodes inside the tree
+func (rbTree *RBTree) Keys() []interface{} {
+	if rbTree.Root == nil {
+		return nil
+	}
+	var keys []interface{}
+	rbTree.key(rbTree.Root, &keys)
+	return keys
 }
 
 func (rbTree *RBTree) size(node *Node) int {
@@ -130,16 +154,16 @@ func (rbTree *RBTree) Empty() bool {
 	return rbTree.Root == nil
 }
 
-func (rbTree *RBTree) minValue(node *Node) interface{} {
+func (rbTree *RBTree) minKey(node *Node) interface{} {
 	if node.leftTree == NIL {
-		return node.value
+		return node.key
 	}
-	return rbTree.minValue(node.leftTree)
+	return rbTree.minKey(node.leftTree)
 }
 
-// MinValue returns the minimum value inside nodes of the tree
-func (rbTree *RBTree) MinValue() interface{} {
-	return rbTree.minValue(rbTree.Root)
+// MinKey returns the minimum key inside nodes of the tree
+func (rbTree *RBTree) MinKey() interface{} {
+	return rbTree.minKey(rbTree.Root)
 }
 
 // NewRBTree creates a new red-black tree
@@ -280,12 +304,12 @@ func (rbTree *RBTree) insertCase(Y *Node) {
 	}
 }
 
-func (rbTree *RBTree) insert(node *Node, value interface{}) {
-	if rbTree.Comparator(node.value, value) >= 0 {
+func (rbTree *RBTree) insert(node *Node, key, value interface{}) {
+	if rbTree.Comparator(node.key, key) >= 0 {
 		if node.leftTree != NIL {
-			rbTree.insert(node.leftTree, value)
+			rbTree.insert(node.leftTree, key, value)
 		} else {
-			tmp := NewNode(value)
+			tmp := NewNode(key, value)
 			tmp.leftTree, tmp.rightTree = NIL, NIL
 			tmp.parent = node
 			node.leftTree = tmp
@@ -293,9 +317,9 @@ func (rbTree *RBTree) insert(node *Node, value interface{}) {
 		}
 	} else {
 		if node.rightTree != NIL {
-			rbTree.insert(node.rightTree, value)
+			rbTree.insert(node.rightTree, key, value)
 		} else {
-			tmp := NewNode(value)
+			tmp := NewNode(key, value)
 			tmp.leftTree, tmp.rightTree = NIL, NIL
 			tmp.parent = node
 			node.rightTree = tmp
@@ -304,14 +328,14 @@ func (rbTree *RBTree) insert(node *Node, value interface{}) {
 	}
 }
 
-// Insert inserts value inside the RBTree
-func (rbTree *RBTree) Insert(value interface{}) {
+// Insert inserts key inside the RBTree
+func (rbTree *RBTree) Insert(key, value interface{}) {
 	if rbTree.Root == nil {
-		rbTree.Root = NewNode(value)
+		rbTree.Root = NewNode(key, value)
 		rbTree.Root.color = Black
 		rbTree.Root.leftTree, rbTree.Root.rightTree = NIL, NIL
 	}
-	rbTree.insert(rbTree.Root, value)
+	rbTree.insert(rbTree.Root, key, value)
 }
 
 func (rbTree *RBTree) getSmallestChild(root *Node) *Node {
@@ -321,24 +345,24 @@ func (rbTree *RBTree) getSmallestChild(root *Node) *Node {
 	return rbTree.getSmallestChild(root.leftTree)
 }
 
-func (rbTree *RBTree) deleteChild(node *Node, value interface{}) bool {
-	if rbTree.Comparator(node.value, value) > 0 {
+func (rbTree *RBTree) deleteChild(node *Node, key interface{}) bool {
+	if rbTree.Comparator(node.key, key) > 0 {
 		if node.leftTree == NIL {
 			return false
 		}
-		return rbTree.deleteChild(node.leftTree, value)
-	} else if rbTree.Comparator(node.value, value) < 0 {
+		return rbTree.deleteChild(node.leftTree, key)
+	} else if rbTree.Comparator(node.key, key) < 0 {
 		if node.rightTree == NIL {
 			return false
 		}
-		return rbTree.deleteChild(node.rightTree, value)
-	} else if rbTree.Comparator(node.value, value) == 0 {
+		return rbTree.deleteChild(node.rightTree, key)
+	} else if rbTree.Comparator(node.key, key) == 0 {
 		if node.rightTree == NIL {
 			rbTree.deleteOneChild(node)
 			return true
 		}
 		smallestNode := rbTree.getSmallestChild(node.rightTree)
-		smallestNode.value, node.value = node.value, smallestNode.value
+		smallestNode.key, node.key = node.key, smallestNode.key
 		rbTree.deleteOneChild(smallestNode)
 		return true
 	}
@@ -445,9 +469,9 @@ func (rbTree *RBTree) deleteCase(Y *Node) {
 	}
 }
 
-// Delete returns true if the input value inside the tree's nodes and successfully deleted
-func (rbTree *RBTree) Delete(value interface{}) bool {
-	return rbTree.deleteChild(rbTree.Root, value)
+// Delete returns true if the input key inside the tree's nodes and successfully deleted
+func (rbTree *RBTree) Delete(key interface{}) bool {
+	return rbTree.deleteChild(rbTree.Root, key)
 }
 
 // Clear clears all nodes inside the tree by setting root to nil

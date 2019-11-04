@@ -9,7 +9,7 @@ import (
 )
 
 func TestRBTree(t *testing.T) {
-	root := NewNode(0)
+	root := NewNode(0, 0)
 	rbTree := NewRBTree(root, container.IntComparator)
 
 	var _ tree.Tree = (*RBTree)(nil)
@@ -19,14 +19,14 @@ func TestRBTree(t *testing.T) {
 	}
 
 	a := []int{1, 2, 3, -5, -3, 5, -8, 8, 4, 6}
-	for _, i := range a {
-		rbTree.Insert(i)
+	for v, k := range a {
+		rbTree.Insert(k, v)
 	}
 
-	if rbTree.Root.value.(int) != 2 {
+	if rbTree.Root.key.(int) != 2 {
 		t.Fail()
 	}
-	if rbTree.MinValue().(int) != -8 {
+	if rbTree.MinKey().(int) != -8 {
 		t.Fail()
 	}
 
@@ -38,8 +38,25 @@ func TestRBTree(t *testing.T) {
 	}
 
 	aSorted := []int{-8, -5, -3, 1, 2, 3, 4, 5, 6, 8}
-	for i, v := range rbTree.Values() {
+	for i, v := range rbTree.Keys() {
 		if v.(int) != aSorted[i] {
+			t.Fail()
+		}
+	}
+	expectedValues := map[int]struct{}{
+		0: {},
+		1: {},
+		2: {},
+		3: {},
+		4: {},
+		5: {},
+		6: {},
+		7: {},
+		8: {},
+		9: {},
+	}
+	for _, v := range rbTree.Values() {
+		if _, found := expectedValues[v.(int)]; !found {
 			t.Fail()
 		}
 	}
@@ -55,14 +72,14 @@ func TestRBTree(t *testing.T) {
 	}
 
 	aSorted = []int{-8, -5, 4, 5, 6, 8}
-	for i, v := range rbTree.Values() {
+	for i, v := range rbTree.Keys() {
 		if v.(int) != aSorted[i] {
 			t.Fail()
 		}
 	}
 
 	rbTree.Clear()
-	if !rbTree.Empty() || rbTree.Size() != 0 || rbTree.Values() != nil {
+	if !rbTree.Empty() || rbTree.Size() != 0 || rbTree.Keys() != nil || rbTree.Values() != nil {
 		t.Fail()
 	}
 }
@@ -78,6 +95,6 @@ func BenchmarkRBTree_Insert(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		rbTree.Insert(data[i])
+		rbTree.Insert(data[i], data[i])
 	}
 }
