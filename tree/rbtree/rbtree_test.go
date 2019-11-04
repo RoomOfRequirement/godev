@@ -9,14 +9,15 @@ import (
 )
 
 func TestRBTree(t *testing.T) {
-	root := NewNode(0, 0)
-	rbTree := NewRBTree(root, container.IntComparator)
-
 	var _ tree.Tree = (*RBTree)(nil)
 
-	if rbTree.Empty() {
+	rbTree := NewRBTree(container.IntComparator)
+
+	if !rbTree.Empty() {
 		t.Fail()
 	}
+
+	rbTree.Insert(0, 0)
 
 	a := []int{1, 2, 3, -5, -3, 5, -8, 8, 4, 6}
 	for v, k := range a {
@@ -31,6 +32,18 @@ func TestRBTree(t *testing.T) {
 	}
 
 	fmt.Println(rbTree)
+
+	for v, k := range a {
+		value, found := rbTree.Get(k)
+		if !found || value.(int) != v {
+			t.Fail()
+		}
+	}
+
+	v, found := rbTree.Get(100)
+	if found || v != nil {
+		t.Fail()
+	}
 
 	ok := rbTree.Delete(0)
 	if !ok {
@@ -78,9 +91,45 @@ func TestRBTree(t *testing.T) {
 		}
 	}
 
+	rbTree.Update(-8, 100)
+
+	v, found = rbTree.Get(-8)
+	if !found || v.(int) != 100 {
+		t.Fail()
+	}
+
+	rbTree.Update(100, 200)
+
+	v, found = rbTree.Get(100)
+	if !found || v.(int) != 200 || rbTree.Size() != 7 {
+		t.Fail()
+	}
+
 	rbTree.Clear()
 	if !rbTree.Empty() || rbTree.Size() != 0 || rbTree.Keys() != nil || rbTree.Values() != nil {
 		t.Fail()
+	}
+}
+
+func TestRBTree_Iterator(t *testing.T) {
+	rbTree := NewRBTree(container.IntComparator)
+
+	a := []int{1, 2, 3, -5, -3, 5, -8, 8, 4, 6}
+	for v, k := range a {
+		rbTree.Insert(k, v)
+	}
+
+	it := rbTree.Iterator()
+	i := 0
+	expectedKeys := []int{-8, -5, -3, 1, 2, 3, 4, 5, 6}
+	expectedValues := []int{6, 3, 4, 0, 1, 2, 8, 5, 9}
+	for it.HasNext() {
+		k, v := it.Next()
+		if k.(int) != expectedKeys[i] || v.(int) != expectedValues[i] {
+			fmt.Println(k, v)
+			t.Fail()
+		}
+		i++
 	}
 }
 

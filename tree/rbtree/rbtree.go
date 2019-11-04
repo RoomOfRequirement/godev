@@ -91,6 +91,7 @@ func (node *Node) String() string {
 type RBTree struct {
 	Root       *Node
 	Comparator container.Comparator
+	itemNum    int
 }
 
 // String returns nodes in rbTree, not pretty, need improved
@@ -137,21 +138,26 @@ func (rbTree *RBTree) Keys() []interface{} {
 	return keys
 }
 
+/*
+// this recursive way is replaced by add itemNum filed to record size
 func (rbTree *RBTree) size(node *Node) int {
 	if node == nil || node == NIL {
 		return 0
 	}
 	return rbTree.size(node.leftTree) + 1 + rbTree.size(node.rightTree)
 }
+*/
 
 // Size returns number of nodes inside the tree
 func (rbTree *RBTree) Size() int {
-	return rbTree.size(rbTree.Root)
+	// return rbTree.size(rbTree.Root)
+	return rbTree.itemNum
 }
 
 // Empty returns true if the tree has no nodes
 func (rbTree *RBTree) Empty() bool {
-	return rbTree.Root == nil
+	// return rbTree.Root == nil
+	return rbTree.itemNum == 0
 }
 
 func (rbTree *RBTree) minKey(node *Node) interface{} {
@@ -167,10 +173,8 @@ func (rbTree *RBTree) MinKey() interface{} {
 }
 
 // NewRBTree creates a new red-black tree
-func NewRBTree(root *Node, comparator container.Comparator) *RBTree {
-	rbTree := &RBTree{Root: root, Comparator: comparator}
-	rbTree.Root.color = Black
-	rbTree.Root.leftTree, rbTree.Root.rightTree = NIL, NIL
+func NewRBTree(comparator container.Comparator) *RBTree {
+	rbTree := &RBTree{Comparator: comparator}
 	return rbTree
 }
 
@@ -334,8 +338,10 @@ func (rbTree *RBTree) Insert(key, value interface{}) {
 		rbTree.Root = NewNode(key, value)
 		rbTree.Root.color = Black
 		rbTree.Root.leftTree, rbTree.Root.rightTree = NIL, NIL
+	} else {
+		rbTree.insert(rbTree.Root, key, value)
 	}
-	rbTree.insert(rbTree.Root, key, value)
+	rbTree.itemNum++
 }
 
 func (rbTree *RBTree) getSmallestChild(root *Node) *Node {
@@ -371,6 +377,7 @@ func (rbTree *RBTree) deleteChild(node *Node, key interface{}) bool {
 
 // when Y has at most one non-NIL child
 func (rbTree *RBTree) deleteOneChild(Y *Node) {
+	rbTree.itemNum--
 	Child := NIL
 	if Y.leftTree == NIL {
 		Child = Y.rightTree
@@ -477,4 +484,83 @@ func (rbTree *RBTree) Delete(key interface{}) bool {
 // Clear clears all nodes inside the tree by setting root to nil
 func (rbTree *RBTree) Clear() {
 	rbTree.Root = nil
+	rbTree.itemNum = 0
+}
+
+// Get returns value with input key when found key inside the tree
+func (rbTree *RBTree) Get(key interface{}) (value interface{}, found bool) {
+	node := rbTree.get(key)
+	if node != nil && node != NIL {
+		return node.value, true
+	}
+	return nil, false
+}
+
+func (rbTree *RBTree) get(key interface{}) *Node {
+	node := rbTree.Root
+	for node != nil && node != NIL {
+		switch rbTree.Comparator(node.key, key) {
+		case 0:
+			return node
+		case -1:
+			node = node.rightTree
+		case 1:
+			node = node.leftTree
+		}
+	}
+	return nil
+}
+
+// Update updates node's value to input value of input key, if key, value not inside the tree, inserts it
+func (rbTree *RBTree) Update(key, value interface{}) {
+	node := rbTree.get(key)
+	if node != nil && node != NIL {
+		node.value = value
+	} else {
+		rbTree.Insert(key, value)
+	}
+}
+
+// Iterator struct
+//	TODO: need improve, better to add a Iterator interface to container, which contains HasNext() and Next() two methods,
+//	 or any better way???
+type Iterator struct {
+	nodes       []*Node
+	cursor, end int
+}
+
+func (rbTree *RBTree) allNodes(node *Node, nodes *[]*Node) {
+	if node.key == nil {
+		return
+	}
+	rbTree.allNodes(node.leftTree, nodes)
+	*nodes = append(*nodes, node)
+	rbTree.allNodes(node.rightTree, nodes)
+}
+
+// Iterator returns a iterator
+func (rbTree *RBTree) Iterator() *Iterator {
+	var allNodes []*Node
+	rbTree.allNodes(rbTree.Root, &allNodes)
+
+	return &Iterator{
+		nodes:  allNodes,
+		cursor: 0,
+		end:    len(allNodes) - 1,
+	}
+}
+
+// HasNext returns true if iterator can still iterate
+func (it *Iterator) HasNext() bool {
+	return it.cursor != it.end
+}
+
+// Next returns key, value stored in the tree, used by Iterator
+func (it *Iterator) Next() (key interface{}, value interface{}) {
+	if it.HasNext() {
+		node := it.nodes[it.cursor]
+		it.cursor++
+		return node.key, node.value
+	}
+	return nil, nil
 }
