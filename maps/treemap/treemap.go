@@ -2,6 +2,7 @@ package treemap
 
 import (
 	container "goContainer"
+	"goContainer/maps"
 	"goContainer/tree/rbtree"
 )
 
@@ -60,6 +61,6 @@ func (m *Map) Clear() {
 }
 
 // Iterator returns iterator, details can be found in red-black tree implementation
-func (m *Map) Iterator() *rbtree.Iterator {
+func (m *Map) Iterator() maps.Iterator {
 	return m.tree.Iterator()
 }

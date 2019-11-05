@@ -3,11 +3,14 @@ package treemap
 import (
 	"fmt"
 	container "goContainer"
+	"goContainer/maps"
+	"goContainer/utils"
 	"testing"
 )
 
 func TestNewMap(t *testing.T) {
 	var _ container.Container = (*Map)(nil)
+	var _ maps.Map = (*Map)(nil)
 
 	m := NewMap(container.IntComparator)
 
@@ -88,5 +91,35 @@ func TestMap_Iterator(t *testing.T) {
 			t.Fail()
 		}
 		i++
+	}
+}
+
+// BenchmarkMap_Set-8   	 1000000	      1717 ns/op
+func BenchmarkMap_Set(b *testing.B) {
+	m := NewMap(container.IntComparator)
+	data := make([]int, b.N)
+	for i := 0; i < b.N; i++ {
+		data[i] = utils.GenerateRandomInt()
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Set(data[i], data[i])
+	}
+}
+
+// BenchmarkMap_Get-8   	 1000000	      1197 ns/op
+func BenchmarkMap_Get(b *testing.B) {
+	m := NewMap(container.IntComparator)
+	data := make([]int, b.N)
+	for i := 0; i < b.N; i++ {
+		data[i] = utils.GenerateRandomInt()
+		m.Set(data[i], data[i])
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		m.Get(data[i])
 	}
 }

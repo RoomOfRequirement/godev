@@ -522,8 +522,6 @@ func (rbTree *RBTree) Update(key, value interface{}) {
 }
 
 // Iterator struct
-//	TODO: need improve, better to add a Iterator interface to container, which contains HasNext() and Next() two methods,
-//	 or any better way???
 type Iterator struct {
 	nodes       []*Node
 	cursor, end int
