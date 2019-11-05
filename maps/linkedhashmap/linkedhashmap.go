@@ -104,7 +104,7 @@ func (iter *iterator) Next() (key, value interface{}) {
 	return it.key.Value, it.value
 }
 
-// Iterator returns iterator, details can be found in red-black tree implementation
+// Iterator returns iterator
 func (m *LinkedHashMap) Iterator() maps.Iterator {
 	iter := iterator{
 		m:      m,
