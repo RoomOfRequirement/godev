@@ -1,4 +1,4 @@
-package minimumSpanningTree
+package mst
 
 import (
 	"fmt"
@@ -6,12 +6,12 @@ import (
 	"testing"
 )
 
-func TestKruskal(t *testing.T) {
+func TestPrim(t *testing.T) {
 	g1, err := graph.NewGraphFromJSON("../../test.json", "graph_mst1")
 	if err != nil {
 		panic(err)
 	}
-	mst1, err := Kruskal(g1)
+	mst1, err := Prim(g1, graph.StringID("A"))
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}
@@ -19,10 +19,16 @@ func TestKruskal(t *testing.T) {
 	DE, _ := g1.GetEdge(graph.StringID("D"), graph.StringID("E"))
 	AB, _ := g1.GetEdge(graph.StringID("A"), graph.StringID("B"))
 	BD, _ := g1.GetEdge(graph.StringID("B"), graph.StringID("D"))
-	expected1 := graph.EdgeSlice{AC, DE, AB, BD}
+
+	expected1 := map[string]struct{}{
+		AC.String(): {},
+		DE.String(): {},
+		AB.String(): {},
+		BD.String(): {},
+	}
 	for i := range mst1 {
-		if mst1[i].String() != expected1[i].String() {
-			fmt.Println(mst1[i], expected1[i])
+		if _, found := expected1[mst1[i].String()]; !found {
+			fmt.Println(mst1[i])
 			t.Fail()
 		}
 	}
@@ -33,7 +39,7 @@ func TestKruskal(t *testing.T) {
 	}
 	// mst2 has two order
 	// ce == ec in test.json
-	mst2, err := Kruskal(g2)
+	mst2, err := Prim(g2, graph.StringID("A"))
 	if err != nil {
 		t.Fatalf("%s\n", err)
 	}

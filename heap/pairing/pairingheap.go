@@ -67,13 +67,12 @@ func meld(r1, r2 *node) *node {
 		// update melded heap's parent
 		r2.parent = r1
 		return r1
-	} else {
-		// put r1 as the first child of r2
-		r2.children = append([]*node{r1}, r2.children...)
-		// update melded heap's parent
-		r1.parent = r2
-		return r2
 	}
+	// put r1 as the first child of r2
+	r2.children = append([]*node{r1}, r2.children...)
+	// update melded heap's parent
+	r1.parent = r2
+	return r2
 }
 
 // Insert inserts an item into heap is by meld the heap with a new heap containing just this item
@@ -140,21 +139,22 @@ func (h *Heap) Search(item heap.Item) bool {
 func (n *node) search(item heap.Item) *node {
 	if n.item.Compare(item) == 0 {
 		return n
-	} else {
-		if len(n.children) == 0 {
-			return nil
-		}
-		var node *node
-
-	loop:
-		for _, child := range n.children {
-			node = child.search(item)
-			if node != nil {
-				break loop
-			}
-		}
-		return node
 	}
+
+	if len(n.children) == 0 {
+		return nil
+	}
+
+	var node *node
+
+loop:
+	for _, child := range n.children {
+		node = child.search(item)
+		if node != nil {
+			break loop
+		}
+	}
+	return node
 }
 
 // Delete deletes item from heap and return it
@@ -162,18 +162,17 @@ func (h *Heap) Delete(item heap.Item) heap.Item {
 	node := h.root.search(item)
 	if node == nil {
 		return nil
-	} else {
-		// new children list
-		children := node.cut()
-		// add to root
-		h.root.children = append(h.root.children, children...)
-		h.itemNum--
-		// set root to nil if empty
-		if h.itemNum == 0 {
-			h.root = nil
-		}
-		return node.item
 	}
+	// new children list
+	children := node.cut()
+	// add to root
+	h.root.children = append(h.root.children, children...)
+	h.itemNum--
+	// set root to nil if empty
+	if h.itemNum == 0 {
+		h.root = nil
+	}
+	return node.item
 }
 
 // cut node and return its children list

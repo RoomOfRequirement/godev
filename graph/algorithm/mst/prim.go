@@ -1,4 +1,4 @@
-package minimumSpanningTree
+package mst
 
 import (
 	"goContainer/graph"

@@ -1,4 +1,4 @@
-package shortestPath
+package shortestpath
 
 import (
 	"fmt"
@@ -6,12 +6,12 @@ import (
 	"testing"
 )
 
-func TestAStar(t *testing.T) {
+func TestDijkstra(t *testing.T) {
 	g, err := graph.NewGraphFromJSON("../../test.json", "graph")
 	if err != nil {
 		panic(err)
 	}
-	path, distance, err := AStar(g, graph.StringID("A"), graph.StringID("E"))
+	path, distance, err := Dijkstra(g, graph.StringID("A"), graph.StringID("E"))
 	if err != nil {
 		panic(err)
 	}

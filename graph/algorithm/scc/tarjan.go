@@ -1,4 +1,4 @@
-package stronglyConnectedComponents
+package scc
 
 import (
 	"goContainer/graph"

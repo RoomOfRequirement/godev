@@ -361,17 +361,15 @@ func (st *SplayTree) insert(x *node, k, v interface{}) *node {
 			x.left = newNode(k, v)
 			x.left.parent = x
 			return x.left
-		} else {
-			return st.insert(x.left, k, v)
 		}
+		return st.insert(x.left, k, v)
 	case 1:
 		if x.right == nil {
 			x.right = newNode(k, v)
 			x.right.parent = x
 			return x.right
-		} else {
-			return st.insert(x.right, k, v)
 		}
+		return st.insert(x.right, k, v)
 	default:
 		return nil
 	}

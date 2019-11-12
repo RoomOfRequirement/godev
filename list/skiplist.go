@@ -54,8 +54,8 @@ func nextPowerOfTwo(n int) int {
 	n |= n >> 2
 	n |= n >> 4
 	n |= n >> 8
-	n |= n >> 16 // 32 bit OS, runtime.GOARCH
-	n |= n >> 32 // 64 bit OS
+	n |= n >> 16 // 32 bit OS, can use `const host32bit = ^uint(0)>>32 == 0` to check (from `strconv.Iota`)
+	n |= n >> 32 // 64 bit OS, but 32 1s >> 32 still 32 1s, so this is OK for both 32 and 64 bit
 	n++
 	return n
 }
