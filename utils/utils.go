@@ -15,6 +15,14 @@ func GenerateRandomInt() int {
 	return rand.Int() - rand.Int()
 }
 
+// GenerateRandomIntInRange returns a random int in range [start, end)
+func GenerateRandomIntInRange(start, end int) int {
+	if start > end {
+		start, end = end, start
+	}
+	return start + rand.Intn(end-start)
+}
+
 const (
 	letterBytes   = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	letterIdxBits = 6                    // 6 bits to represent a letter index

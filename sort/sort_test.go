@@ -14,6 +14,10 @@ func TestIntSlice(t *testing.T) {
 	if is[0] != 3 || is[2] != 1 {
 		t.Fail()
 	}
+
+	if min, max := is.MinMax(); min != 1 || max != 3 {
+		t.Fail()
+	}
 }
 
 func TestEqual(t *testing.T) {

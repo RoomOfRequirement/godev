@@ -1,6 +1,7 @@
 package sort
 
 // Interface is sort interface for all sorting methods, same with golang official sort interface
+//	https://en.wikipedia.org/wiki/Sorting_algorithm
 type Interface interface {
 	// Len returns number of elements in the collection
 	Len() int
@@ -12,6 +13,8 @@ type Interface interface {
 
 // IntSlice type for testing sort
 type IntSlice []int
+
+const intSize = 32 << (^uint(0) >> 63)
 
 // Len returns number of elements in the IntSlice
 func (is IntSlice) Len() int {
@@ -28,6 +31,22 @@ func (is IntSlice) Swap(i, j int) {
 	is[i], is[j] = is[j], is[i]
 }
 
+// MinMax returns min and max of int slice
+func (is IntSlice) MinMax() (min, max int) {
+	min = 1<<(intSize-1) - 1
+	max = -1 << (intSize - 1)
+	for _, n := range is {
+		if n < min {
+			min = n
+		}
+		if n > max {
+			max = n
+		}
+	}
+	return
+}
+
+// Equal returns true if two sorted slices are the same
 func Equal(is1, is2 IntSlice) bool {
 	if is1.Len() != is2.Len() {
 		return false
