@@ -172,3 +172,14 @@ func (lru *LRU) removeItem(e *list.Element) (key, value interface{}) {
 	}
 	return
 }
+
+// Keys returns all keys in the cache, from oldest to newest
+func (lru *LRU) Keys() []interface{} {
+	keys := make([]interface{}, len(lru.pairs))
+	i := 0
+	for e := lru.evicts.Back(); e != nil; e = e.Prev() {
+		keys[i] = e.Value
+		i++
+	}
+	return keys
+}

@@ -62,7 +62,7 @@ func (c *Cache) Contains(key interface{}) (found bool) {
 // Remove removes key value if found in the cache
 func (c *Cache) Remove(key interface{}) (value interface{}, found bool) {
 	c.lock.Lock()
-	value, found = c.lru.Peek(key)
+	value, found = c.lru.Remove(key)
 	c.lock.Unlock()
 	return
 }
@@ -78,7 +78,7 @@ func (c *Cache) GetLeastUsed() (key, value interface{}, found bool) {
 // RemoveLeastUsed removes and returns least used key value pairs if found in the cache
 func (c *Cache) RemoveLeastUsed() (key, value interface{}, found bool) {
 	c.lock.Lock()
-	key, value, found = c.lru.GetLeastUsed()
+	key, value, found = c.lru.RemoveLeastUsed()
 	c.lock.Unlock()
 	return
 }
