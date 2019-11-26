@@ -144,9 +144,9 @@ func (c *CacheTTL) Size() int {
 }
 
 // Resize resize cache size and returns diff
-func (c *CacheTTL) Resize(size int) (diff int) {
+func (c *CacheTTL) Resize(size int) (diff int, err error) {
 	c.lock.Lock()
-	diff = c.lru.Resize(size)
+	diff, err = c.lru.Resize(size)
 	c.lock.Unlock()
 	return
 }

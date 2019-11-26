@@ -92,9 +92,9 @@ func (c *Cache) Size() int {
 }
 
 // Resize resize cache size and returns diff
-func (c *Cache) Resize(size int) (diff int) {
+func (c *Cache) Resize(size int) (diff int, err error) {
 	c.lock.Lock()
-	diff = c.lru.Resize(size)
+	diff, err = c.lru.Resize(size)
 	c.lock.Unlock()
 	return
 }

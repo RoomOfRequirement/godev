@@ -2,11 +2,13 @@ package lru
 
 import (
 	"fmt"
+	"goContainer/cache"
 	"goContainer/utils"
 	"testing"
 )
 
 func TestNewLRU(t *testing.T) {
+	var _ cache.Interface = (*LRU)(nil)
 	lru, err := NewLRU(10, func(key interface{}, value interface{}) {
 		fmt.Printf("key: %v, value: %v pair is deleted\n", key, value)
 	})

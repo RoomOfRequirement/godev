@@ -2,26 +2,29 @@ package lru
 
 import (
 	"fmt"
+	"goContainer/cache"
 	"goContainer/utils"
 	"math/rand"
 	"testing"
 )
 
 func TestNewCache(t *testing.T) {
-	cache, err := NewCacheWithOnEvict(10, func(key interface{}, value interface{}) {
+	var _ cache.Interface = (*Cache)(nil)
+
+	cache2, err := NewCacheWithOnEvict(10, func(key interface{}, value interface{}) {
 		fmt.Printf("key: %v, value: %v pair is deleted\n", key, value)
 	})
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-	if cache.Size() != 0 {
-		t.Fatal(cache.Size(), cache.lru.size)
+	if cache2.Size() != 0 {
+		t.Fatal(cache2.Size(), cache2.lru.size)
 	}
-	k, v, found := cache.GetLeastUsed()
+	k, v, found := cache2.GetLeastUsed()
 	if k != nil || v != nil || found {
 		t.Fatal(k, v, found)
 	}
-	k, v, found = cache.RemoveLeastUsed()
+	k, v, found = cache2.RemoveLeastUsed()
 	if k != nil || v != nil || found {
 		t.Fatal(k, v, found)
 	}
@@ -33,7 +36,7 @@ func TestNewCache(t *testing.T) {
 }
 
 func TestCache_Add(t *testing.T) {
-	cache, err := NewCache(10)
+	cache2, err := NewCache(10)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -41,72 +44,72 @@ func TestCache_Add(t *testing.T) {
 	a := make([]string, 10)
 	for i := range a {
 		a[i] = utils.GenerateRandomString(5)
-		found, evicted := cache.Add(a[i], i)
+		found, evicted := cache2.Add(a[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cache.Size(), cache.lru.size)
+			t.Fatal(found, evicted, cache2.Size(), cache2.lru.size)
 		}
 	}
 
-	if cache.Size() != 10 {
-		t.Fatal(cache.Size(), cache.lru.size)
+	if cache2.Size() != 10 {
+		t.Fatal(cache2.Size(), cache2.lru.size)
 	}
 
 	for i := range a {
-		if !cache.Contains(a[i]) {
+		if !cache2.Contains(a[i]) {
 			t.Fatal(a[i], i)
 		}
 	}
 
 	for i := range a {
-		found, evicted := cache.Add(a[i], i)
+		found, evicted := cache2.Add(a[i], i)
 		if !found || evicted {
-			t.Fatal(found, evicted, cache.Size(), cache.lru.size)
+			t.Fatal(found, evicted, cache2.Size(), cache2.lru.size)
 		}
 	}
 
 	b := make([]int, 10)
 	for i := range b {
 		b[i] = utils.GenerateRandomInt()
-		found, evicted := cache.Add(b[i], i)
+		found, evicted := cache2.Add(b[i], i)
 		if found || !evicted {
-			t.Fatal(found, evicted, cache.Size(), cache.lru.size)
+			t.Fatal(found, evicted, cache2.Size(), cache2.lru.size)
 		}
 	}
 
-	cache.Resize(20)
+	cache2.Resize(20)
 	for i := range a {
-		found, evicted := cache.Add(a[i], i)
+		found, evicted := cache2.Add(a[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cache.Size(), cache.lru.size)
+			t.Fatal(found, evicted, cache2.Size(), cache2.lru.size)
 		}
 	}
 
-	cache.Resize(10)
+	cache2.Resize(10)
 	for i := range b {
-		found, evicted := cache.Add(b[i], i)
+		found, evicted := cache2.Add(b[i], i)
 		if found || !evicted {
-			t.Fatal(found, evicted, cache.Size(), cache.lru.size)
+			t.Fatal(found, evicted, cache2.Size(), cache2.lru.size)
 		}
 	}
 
-	k, v, found := cache.GetLeastUsed()
+	k, v, found := cache2.GetLeastUsed()
 	if k != b[0] || v != 0 || !found {
 		t.Fatal(k, b[0], v, 0, found)
 	}
 
-	k, v, found = cache.RemoveLeastUsed()
+	k, v, found = cache2.RemoveLeastUsed()
 	if k != b[0] || v != 0 || !found {
 		t.Fatal(k, b[0], v, 0, found)
 	}
 
-	cache.Clear()
-	if cache.Size() != 0 {
-		t.Fatal(cache.Size(), cache.lru.size)
+	cache2.Clear()
+	if cache2.Size() != 0 {
+		t.Fatal(cache2.Size(), cache2.lru.size)
 	}
 }
 
 func TestCache_Get(t *testing.T) {
-	cache, err := NewCache(20)
+	cache2, err := NewCache(20)
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -114,12 +117,12 @@ func TestCache_Get(t *testing.T) {
 	a := make([]string, 10)
 	for i := range a {
 		a[i] = utils.GenerateRandomString(5)
-		found, evicted := cache.Add(a[i], i)
+		found, evicted := cache2.Add(a[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cache.Size(), cache.lru.size)
+			t.Fatal(found, evicted, cache2.Size(), cache2.lru.size)
 		}
 	}
-	k, v, found := cache.GetLeastUsed()
+	k, v, found := cache2.GetLeastUsed()
 	if k != a[0] || v != 0 || !found {
 		t.Fatal(k, a[0], v, 0, found)
 	}
@@ -127,52 +130,52 @@ func TestCache_Get(t *testing.T) {
 	b := make([]int, 10)
 	for i := range b {
 		b[i] = utils.GenerateRandomInt()
-		found, evicted := cache.Add(b[i], i)
+		found, evicted := cache2.Add(b[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cache.Size(), cache.lru.size)
+			t.Fatal(found, evicted, cache2.Size(), cache2.lru.size)
 		}
 	}
-	k, v, found = cache.GetLeastUsed()
+	k, v, found = cache2.GetLeastUsed()
 	if k != a[0] || v != 0 || !found {
 		t.Fatal(k, a[0], v, 0, found)
 	}
 
 	for i := range a {
-		value, found := cache.Get(a[i])
+		value, found := cache2.Get(a[i])
 		if !found || value != i {
 			t.Fatal(found, a[i], i, value)
 		}
 	}
 
-	cache.Resize(10)
+	cache2.Resize(10)
 	for i := range a {
-		value, found := cache.Peek(a[i])
+		value, found := cache2.Peek(a[i])
 		if !found || value != i {
 			t.Fatal(found, a[i], i, value)
 		}
 	}
 	for i := range b {
-		value, found := cache.Peek(b[i])
+		value, found := cache2.Peek(b[i])
 		if found || value != nil {
 			t.Fatal(found, b[i], i, value)
 		}
 	}
 	for i := range b {
-		value, found := cache.Get(b[i])
+		value, found := cache2.Get(b[i])
 		if found || value != nil {
 			t.Fatal(found, b[i], i, value)
 		}
 	}
 
 	for i := range b {
-		value, found := cache.Remove(b[i])
+		value, found := cache2.Remove(b[i])
 		if found || value != nil {
 			t.Fatal(found, b[i])
 		}
 	}
 
 	for i := range a {
-		value, found := cache.Remove(a[i])
+		value, found := cache2.Remove(a[i])
 		if !found || value != i {
 			t.Fatal(found, a[i])
 		}
@@ -180,7 +183,7 @@ func TestCache_Get(t *testing.T) {
 }
 
 func BenchmarkCache(b *testing.B) {
-	cache, _ := NewCache(1024 * 8)
+	cache2, _ := NewCache(1024 * 8)
 	data := make([]int, b.N*2)
 	for i := 0; i < b.N*2; i++ {
 		data[i] = rand.Intn(1024 * 16)
@@ -191,9 +194,9 @@ func BenchmarkCache(b *testing.B) {
 	hit, miss := 0, 0
 	for i := 0; i < 2*b.N; i++ {
 		if i&1 == 0 { // i % 2
-			cache.Add(data[i], data[i])
+			cache2.Add(data[i], data[i])
 		} else {
-			if _, ok := cache.Get(data[i]); ok {
+			if _, ok := cache2.Get(data[i]); ok {
 				hit++
 			} else {
 				miss++

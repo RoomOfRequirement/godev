@@ -109,9 +109,13 @@ func (lru *LRU) Size() int {
 }
 
 // Resize resize cache size and returns diff
-func (lru *LRU) Resize(size int) (diff int) {
+func (lru *LRU) Resize(size int) (diff int, err error) {
 	diff = size - lru.size
-	lru.size = size
+	if size > 0 {
+		lru.size = size
+	} else {
+		return 0, errors.New("resize size should be larger than 0")
+	}
 
 	if diff >= 0 {
 		return

@@ -12,12 +12,12 @@ type Interface interface {
 	// Contains returns true if key found in the cache without updating timestamp
 	Contains(key interface{}) (found bool)
 	// Remove removes key value if found in the cache
-	Remove(key interface{}) (found bool)
+	Remove(key interface{}) (value interface{}, found bool)
 	// Size returns key value pair numbers in the cache
 	//	if want memory size in bytes, need to use unsafe.Sizeof, which may not be supported in some platform
 	Size() int
 	// Resize resize cache size and returns diff
-	Resize(size int) (diff int)
+	Resize(size int) (diff int, err error)
 
 	// Clear clears all pairs in the cache
 	Clear()
