@@ -13,6 +13,8 @@ type Interface interface {
 	Contains(key interface{}) (found bool)
 	// Remove removes key value if found in the cache
 	Remove(key interface{}) (value interface{}, found bool)
+	// RemoveLeastUsed removes least used key value if found in the cache
+	RemoveLeastUsed() (key, value interface{}, found bool)
 	// Size returns key value pair numbers in the cache
 	//	if want memory size in bytes, need to use unsafe.Sizeof, which may not be supported in some platform
 	Size() int
@@ -22,3 +24,6 @@ type Interface interface {
 	// Clear clears all pairs in the cache
 	Clear()
 }
+
+// EvictCallback called when a lru entry is evicted
+type EvictCallback func(key interface{}, value interface{})

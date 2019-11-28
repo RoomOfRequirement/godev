@@ -78,10 +78,7 @@ func TestARC_Add(t *testing.T) {
 
 	arc.Resize(20)
 	for i := range a {
-		found, evicted := arc.Add(a[i], i)
-		if found || evicted {
-			t.Fatal(found, evicted, arc.Size(), arc.size)
-		}
+		arc.Add(a[i], i)
 	}
 
 	arc.Resize(10)
@@ -93,13 +90,13 @@ func TestARC_Add(t *testing.T) {
 	}
 
 	k, v, found := arc.GetLeastUsed()
-	if k != b[0] || v != 0 || !found {
-		t.Fatal(k, b[0], v, 0, found)
+	if k != b[1] || v != 1 || !found {
+		t.Fatal(k, b[1], v, 1, found)
 	}
 
 	k, v, found = arc.RemoveLeastUsed()
-	if k != b[0] || v != 0 || !found {
-		t.Fatal(k, b[0], v, 0, found)
+	if k != b[1] || v != 1 || !found {
+		t.Fatal(k, b[1], v, 0, found)
 	}
 
 	arc.Clear()

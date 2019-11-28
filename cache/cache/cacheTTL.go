@@ -1,15 +1,17 @@
-package lru
+package cache
 
 import (
 	"fmt"
+	"goContainer/cache"
+	"goContainer/cache/lru"
 	"os"
 	"sync"
 	"time"
 )
 
-// CacheTTL struct
-type CacheTTL struct {
-	lru      *LRU
+// TTL struct
+type TTL struct {
+	lru      *lru.LRU
 	lock     sync.RWMutex
 	ttl      time.Duration
 	stopChan chan bool
@@ -23,14 +25,14 @@ type ttlEntry struct {
 
 // NewCacheTTL creates a new ttl-enabled lru cache with input size
 //	notice: default least ttl is 1 second, default least cleanInterval is 2 seconds
-func NewCacheTTL(size int, ttl, cleanInterval time.Duration) (*CacheTTL, error) {
+func NewCacheTTL(size int, ttl, cleanInterval time.Duration) (*TTL, error) {
 	return NewCacheTTLWithOnEvict(size, ttl, cleanInterval, nil)
 }
 
 // NewCacheTTLWithOnEvict creates a new ttl-enabled lru cache with input size and onEvict function
 //	notice: default least ttl is 1 second, default least cleanInterval is 2 seconds
-func NewCacheTTLWithOnEvict(size int, ttl, cleanInterval time.Duration, onEvict EvictCallback) (*CacheTTL, error) {
-	lru, err := NewLRU(size, onEvict)
+func NewCacheTTLWithOnEvict(size int, ttl, cleanInterval time.Duration, onEvict cache.EvictCallback) (*TTL, error) {
+	c, err := lru.NewLRU(size, onEvict)
 	if err != nil {
 		return nil, err
 	}
@@ -39,8 +41,8 @@ func NewCacheTTLWithOnEvict(size int, ttl, cleanInterval time.Duration, onEvict 
 		ttl = 1 * time.Second
 	}
 
-	cacheTTL := &CacheTTL{
-		lru:  lru,
+	cacheTTL := &TTL{
+		lru:  c,
 		lock: sync.RWMutex{},
 		ttl:  ttl,
 	}
@@ -54,7 +56,7 @@ func NewCacheTTLWithOnEvict(size int, ttl, cleanInterval time.Duration, onEvict 
 }
 
 // Add adds key value to the cache if not found else update value and returns true if an eviction occurred
-func (c *CacheTTL) Add(key, value interface{}) (found, evicted bool) {
+func (c *TTL) Add(key, value interface{}) (found, evicted bool) {
 	c.lock.Lock()
 	found, evicted = c.lru.Add(key, ttlEntry{
 		value:            value,
@@ -65,7 +67,7 @@ func (c *CacheTTL) Add(key, value interface{}) (found, evicted bool) {
 }
 
 // Get returns value if key and update timestamp
-func (c *CacheTTL) Get(key interface{}) (value interface{}, found bool) {
+func (c *TTL) Get(key interface{}) (value interface{}, found bool) {
 	// Lock due to updating timestamp
 	c.lock.Lock()
 	entry, found := c.lru.Get(key)
@@ -83,7 +85,7 @@ func (c *CacheTTL) Get(key interface{}) (value interface{}, found bool) {
 }
 
 // Peek returns value of key without updating timestamp
-func (c *CacheTTL) Peek(key interface{}) (value interface{}, found bool) {
+func (c *TTL) Peek(key interface{}) (value interface{}, found bool) {
 	// RLock due to not updating
 	c.lock.RLock()
 	entry, found := c.lru.Peek(key)
@@ -95,7 +97,7 @@ func (c *CacheTTL) Peek(key interface{}) (value interface{}, found bool) {
 }
 
 // Contains returns true if key found in the cache without updating timestamp
-func (c *CacheTTL) Contains(key interface{}) (found bool) {
+func (c *TTL) Contains(key interface{}) (found bool) {
 	c.lock.RLock()
 	found = c.lru.Contains(key)
 	c.lock.RUnlock()
@@ -103,7 +105,7 @@ func (c *CacheTTL) Contains(key interface{}) (found bool) {
 }
 
 // Remove removes key value if found in the cache
-func (c *CacheTTL) Remove(key interface{}) (value interface{}, found bool) {
+func (c *TTL) Remove(key interface{}) (value interface{}, found bool) {
 	c.lock.Lock()
 	entry, found := c.lru.Remove(key)
 	if found {
@@ -114,7 +116,7 @@ func (c *CacheTTL) Remove(key interface{}) (value interface{}, found bool) {
 }
 
 // GetLeastUsed returns least used key value pairs if found in the cache
-func (c *CacheTTL) GetLeastUsed() (key, value interface{}, found bool) {
+func (c *TTL) GetLeastUsed() (key, value interface{}, found bool) {
 	c.lock.RLock()
 	key, entry, found := c.lru.GetLeastUsed()
 	if found {
@@ -125,7 +127,7 @@ func (c *CacheTTL) GetLeastUsed() (key, value interface{}, found bool) {
 }
 
 // RemoveLeastUsed removes and returns least used key value pairs if found in the cache
-func (c *CacheTTL) RemoveLeastUsed() (key, value interface{}, found bool) {
+func (c *TTL) RemoveLeastUsed() (key, value interface{}, found bool) {
 	c.lock.Lock()
 	key, entry, found := c.lru.RemoveLeastUsed()
 	if found {
@@ -137,14 +139,14 @@ func (c *CacheTTL) RemoveLeastUsed() (key, value interface{}, found bool) {
 
 // Size returns key value pair numbers in the cache
 //	if want memory size in bytes, need to use unsafe.Sizeof, which may not be supported in some platform
-func (c *CacheTTL) Size() int {
+func (c *TTL) Size() int {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 	return c.lru.Size()
 }
 
 // Resize resize cache size and returns diff
-func (c *CacheTTL) Resize(size int) (diff int, err error) {
+func (c *TTL) Resize(size int) (diff int, err error) {
 	c.lock.Lock()
 	diff, err = c.lru.Resize(size)
 	c.lock.Unlock()
@@ -152,7 +154,7 @@ func (c *CacheTTL) Resize(size int) (diff int, err error) {
 }
 
 // Clear clears all pairs in the cache
-func (c *CacheTTL) Clear() {
+func (c *TTL) Clear() {
 	c.lock.Lock()
 	c.lru.Clear()
 	c.lock.Unlock()
@@ -160,7 +162,7 @@ func (c *CacheTTL) Clear() {
 }
 
 // ResetTTL resets ttl
-func (c *CacheTTL) ResetTTL(ttl time.Duration) {
+func (c *TTL) ResetTTL(ttl time.Duration) {
 	c.lock.Lock()
 	c.ttl = ttl
 	c.lock.Unlock()
@@ -168,7 +170,7 @@ func (c *CacheTTL) ResetTTL(ttl time.Duration) {
 }
 
 // StopCleanWork stops clean expired goroutine
-func (c *CacheTTL) StopCleanWork() {
+func (c *TTL) StopCleanWork() {
 	c.lock.Lock()
 	c.stopChan <- true
 	close(c.stopChan)
@@ -177,7 +179,7 @@ func (c *CacheTTL) StopCleanWork() {
 }
 
 // RestartCleanWork restarts clean expired goroutine
-func (c *CacheTTL) RestartCleanWork(cleanInterval time.Duration) {
+func (c *TTL) RestartCleanWork(cleanInterval time.Duration) {
 	if cleanInterval <= 1*time.Second {
 		cleanInterval = 2 * time.Second
 	}
@@ -197,7 +199,7 @@ func (c *CacheTTL) RestartCleanWork(cleanInterval time.Duration) {
 // removeExpired removes expired key pairs in one background goroutine
 //	notice: default cleanInterval is 2 seconds
 //	https://stackoverflow.com/questions/17797754/ticker-stop-behaviour-in-golang
-func (c *CacheTTL) removeExpired(cleanInterval *time.Ticker) chan bool {
+func (c *TTL) removeExpired(cleanInterval *time.Ticker) chan bool {
 	stopChan := make(chan bool, 1)
 
 	go func(cleanInterval *time.Ticker) {

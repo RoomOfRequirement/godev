@@ -3,6 +3,7 @@ package lru
 import (
 	"container/list"
 	"errors"
+	"goContainer/cache"
 )
 
 // LRU struct
@@ -14,7 +15,7 @@ type LRU struct {
 	evicts *list.List
 	pairs  map[interface{}]*item
 
-	onEvict EvictCallback
+	onEvict cache.EvictCallback
 }
 
 type item struct {
@@ -22,11 +23,8 @@ type item struct {
 	value interface{}
 }
 
-// EvictCallback called when a lru entry is evicted
-type EvictCallback func(key interface{}, value interface{})
-
 // NewLRU creates a new LRU cache with input size and onEvict function
-func NewLRU(size int, onEvict EvictCallback) (*LRU, error) {
+func NewLRU(size int, onEvict cache.EvictCallback) (*LRU, error) {
 	if size <= 0 {
 		return nil, errors.New("invalid cache size")
 	}

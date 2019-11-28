@@ -1,34 +1,62 @@
-package lru
+package cache
 
-import "sync"
+import (
+	"errors"
+	"goContainer/cache"
+	"goContainer/cache/arc"
+	"goContainer/cache/lfu"
+	"goContainer/cache/lru"
+	"sync"
+)
 
 // Cache struct
 type Cache struct {
-	lru  *LRU
-	lock sync.RWMutex
+	cache cache.Interface
+	lock  sync.RWMutex
 }
 
+// Type for backend cache type
+type Type int
+
+// supported backend cache type
+const (
+	LRU = iota
+	LFU
+	ARC
+)
+
 // NewCache creates a new lru cache with input size
-func NewCache(size int) (*Cache, error) {
-	return NewCacheWithOnEvict(size, nil)
+func NewCache(size int, cacheType Type) (*Cache, error) {
+	return NewCacheWithOnEvict(size, cacheType, nil)
 }
 
 // NewCacheWithOnEvict creates a new lru cache with input size and onEvict function
-func NewCacheWithOnEvict(size int, onEvict EvictCallback) (*Cache, error) {
-	lru, err := NewLRU(size, onEvict)
+func NewCacheWithOnEvict(size int, cacheType Type, onEvict cache.EvictCallback) (*Cache, error) {
+	var err error
+	var c cache.Interface
+	switch cacheType {
+	case LRU:
+		c, err = lru.NewLRU(size, onEvict)
+	case LFU:
+		c, err = lfu.NewLFU(size, onEvict)
+	case ARC:
+		c, err = arc.NewARC(size, onEvict)
+	default:
+		err = errors.New("unsupported cache type")
+	}
 	if err != nil {
 		return nil, err
 	}
 	return &Cache{
-		lru:  lru,
-		lock: sync.RWMutex{},
+		cache: c,
+		lock:  sync.RWMutex{},
 	}, nil
 }
 
 // Add adds key value to the cache if not found else update value and returns true if an eviction occurred
 func (c *Cache) Add(key, value interface{}) (found, evicted bool) {
 	c.lock.Lock()
-	found, evicted = c.lru.Add(key, value)
+	found, evicted = c.cache.Add(key, value)
 	c.lock.Unlock()
 	return
 }
@@ -37,7 +65,7 @@ func (c *Cache) Add(key, value interface{}) (found, evicted bool) {
 func (c *Cache) Get(key interface{}) (value interface{}, found bool) {
 	// Lock due to updating timestamp
 	c.lock.Lock()
-	value, found = c.lru.Get(key)
+	value, found = c.cache.Get(key)
 	c.lock.Unlock()
 	return
 }
@@ -46,7 +74,7 @@ func (c *Cache) Get(key interface{}) (value interface{}, found bool) {
 func (c *Cache) Peek(key interface{}) (value interface{}, found bool) {
 	// RLock due to not updating
 	c.lock.RLock()
-	value, found = c.lru.Peek(key)
+	value, found = c.cache.Peek(key)
 	c.lock.RUnlock()
 	return
 }
@@ -54,7 +82,7 @@ func (c *Cache) Peek(key interface{}) (value interface{}, found bool) {
 // Contains returns true if key found in the cache without updating timestamp
 func (c *Cache) Contains(key interface{}) (found bool) {
 	c.lock.RLock()
-	found = c.lru.Contains(key)
+	found = c.cache.Contains(key)
 	c.lock.RUnlock()
 	return
 }
@@ -62,23 +90,15 @@ func (c *Cache) Contains(key interface{}) (found bool) {
 // Remove removes key value if found in the cache
 func (c *Cache) Remove(key interface{}) (value interface{}, found bool) {
 	c.lock.Lock()
-	value, found = c.lru.Remove(key)
+	value, found = c.cache.Remove(key)
 	c.lock.Unlock()
-	return
-}
-
-// GetLeastUsed returns least used key value pairs if found in the cache
-func (c *Cache) GetLeastUsed() (key, value interface{}, found bool) {
-	c.lock.RLock()
-	key, value, found = c.lru.GetLeastUsed()
-	c.lock.RUnlock()
 	return
 }
 
 // RemoveLeastUsed removes and returns least used key value pairs if found in the cache
 func (c *Cache) RemoveLeastUsed() (key, value interface{}, found bool) {
 	c.lock.Lock()
-	key, value, found = c.lru.RemoveLeastUsed()
+	key, value, found = c.cache.RemoveLeastUsed()
 	c.lock.Unlock()
 	return
 }
@@ -88,13 +108,13 @@ func (c *Cache) RemoveLeastUsed() (key, value interface{}, found bool) {
 func (c *Cache) Size() int {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
-	return c.lru.Size()
+	return c.cache.Size()
 }
 
 // Resize resize cache size and returns diff
 func (c *Cache) Resize(size int) (diff int, err error) {
 	c.lock.Lock()
-	diff, err = c.lru.Resize(size)
+	diff, err = c.cache.Resize(size)
 	c.lock.Unlock()
 	return
 }
@@ -102,7 +122,7 @@ func (c *Cache) Resize(size int) (diff int, err error) {
 // Clear clears all pairs in the cache
 func (c *Cache) Clear() {
 	c.lock.Lock()
-	c.lru.Clear()
+	c.cache.Clear()
 	c.lock.Unlock()
 	return
 }

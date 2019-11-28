@@ -1,4 +1,4 @@
-package lru
+package cache
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewCacheTTL(t *testing.T) {
-	var _ cache.Interface = (*CacheTTL)(nil)
+	var _ cache.Interface = (*TTL)(nil)
 
 	cacheTTL, err := NewCacheTTLWithOnEvict(10, 10*time.Second, 0,
 		func(key interface{}, value interface{}) {
@@ -19,7 +19,7 @@ func TestNewCacheTTL(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 	if cacheTTL.Size() != 0 {
-		t.Fatal(cacheTTL.Size(), cacheTTL.lru.size)
+		t.Fatal(cacheTTL.Size())
 	}
 	k, v, found := cacheTTL.GetLeastUsed()
 	if k != nil || v != nil || found {
@@ -47,12 +47,12 @@ func TestCacheTTL_Add(t *testing.T) {
 		a[i] = utils.GenerateRandomString(5)
 		found, evicted := cacheTTL.Add(a[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cacheTTL.Size(), cacheTTL.lru.size)
+			t.Fatal(found, evicted, cacheTTL.Size())
 		}
 	}
 
 	if cacheTTL.Size() != 10 {
-		t.Fatal(cacheTTL.Size(), cacheTTL.lru.size)
+		t.Fatal(cacheTTL.Size())
 	}
 
 	for i := range a {
@@ -64,7 +64,7 @@ func TestCacheTTL_Add(t *testing.T) {
 	for i := range a {
 		found, evicted := cacheTTL.Add(a[i], i)
 		if !found || evicted {
-			t.Fatal(found, evicted, cacheTTL.Size(), cacheTTL.lru.size)
+			t.Fatal(found, evicted, cacheTTL.Size())
 		}
 	}
 
@@ -73,7 +73,7 @@ func TestCacheTTL_Add(t *testing.T) {
 		b[i] = utils.GenerateRandomInt()
 		found, evicted := cacheTTL.Add(b[i], i)
 		if found || !evicted {
-			t.Fatal(found, evicted, cacheTTL.Size(), cacheTTL.lru.size)
+			t.Fatal(found, evicted, cacheTTL.Size())
 		}
 	}
 
@@ -81,7 +81,7 @@ func TestCacheTTL_Add(t *testing.T) {
 	for i := range a {
 		found, evicted := cacheTTL.Add(a[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cacheTTL.Size(), cacheTTL.lru.size)
+			t.Fatal(found, evicted, cacheTTL.Size())
 		}
 	}
 
@@ -89,7 +89,7 @@ func TestCacheTTL_Add(t *testing.T) {
 	for i := range b {
 		found, evicted := cacheTTL.Add(b[i], i)
 		if found || !evicted {
-			t.Fatal(found, evicted, cacheTTL.Size(), cacheTTL.lru.size)
+			t.Fatal(found, evicted, cacheTTL.Size())
 		}
 	}
 
@@ -105,12 +105,12 @@ func TestCacheTTL_Add(t *testing.T) {
 
 	time.Sleep(3 * time.Second)
 	if cacheTTL.Size() != 0 {
-		t.Fatal(cacheTTL.Size(), cacheTTL.lru.size)
+		t.Fatal(cacheTTL.Size())
 	}
 
 	cacheTTL.Clear()
 	if cacheTTL.Size() != 0 {
-		t.Fatal(cacheTTL.Size(), cacheTTL.lru.size)
+		t.Fatal(cacheTTL.Size())
 	}
 }
 
@@ -125,7 +125,7 @@ func TestCacheTTL_Get(t *testing.T) {
 		a[i] = utils.GenerateRandomString(5)
 		found, evicted := cacheTTL.Add(a[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cacheTTL.Size(), cacheTTL.lru.size)
+			t.Fatal(found, evicted, cacheTTL.Size())
 		}
 	}
 	k, v, found := cacheTTL.GetLeastUsed()
@@ -138,7 +138,7 @@ func TestCacheTTL_Get(t *testing.T) {
 		b[i] = utils.GenerateRandomInt()
 		found, evicted := cacheTTL.Add(b[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cacheTTL.Size(), cacheTTL.lru.size)
+			t.Fatal(found, evicted, cacheTTL.Size())
 		}
 	}
 	k, v, found = cacheTTL.GetLeastUsed()
@@ -199,20 +199,20 @@ func TestCacheTTL_StopCleanWork(t *testing.T) {
 		a[i] = utils.GenerateRandomString(5)
 		found, evicted := cacheTTL.Add(a[i], i)
 		if found || evicted {
-			t.Fatal(found, evicted, cacheTTL.Size(), cacheTTL.lru.size)
+			t.Fatal(found, evicted, cacheTTL.Size())
 		}
 	}
 
 	cacheTTL.StopCleanWork()
 	time.Sleep(3 * time.Second)
 	if cacheTTL.Size() != 10 {
-		t.Fatal(cacheTTL.Size(), cacheTTL.lru.size)
+		t.Fatal(cacheTTL.Size())
 	}
 
 	cacheTTL.RestartCleanWork(0)
 	time.Sleep(3 * time.Second)
 	if cacheTTL.Size() != 0 {
-		t.Fatal(cacheTTL.Size(), cacheTTL.lru.size)
+		t.Fatal(cacheTTL.Size())
 	}
 
 	cacheTTL.ResetTTL(5 * time.Second)

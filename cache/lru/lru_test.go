@@ -26,6 +26,9 @@ func TestNewLRU(t *testing.T) {
 	if k != nil || v != nil || found {
 		t.Fatal(k, v, found)
 	}
+	if len(lru.Keys()) != 0 {
+		t.Fail()
+	}
 
 	_, err = NewLRU(-10, nil)
 	if err == nil || err.Error() != "invalid cache size" {
@@ -50,7 +53,7 @@ func TestLRU_Add(t *testing.T) {
 		}
 	}
 
-	if lru.Size() != 10 {
+	if lru.Size() != 10 || len(lru.Keys()) != 10 {
 		t.Fatal(lru.Size(), lru.size)
 	}
 

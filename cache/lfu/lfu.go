@@ -3,6 +3,7 @@ package lfu
 import (
 	"container/list"
 	"errors"
+	"goContainer/cache"
 )
 
 // LFU struct (least frequently used)
@@ -13,7 +14,7 @@ type LFU struct {
 	freqList *list.List
 	pairs    map[interface{}]*item
 
-	onEvict EvictCallback
+	onEvict cache.EvictCallback
 }
 
 type freqItem struct {
@@ -29,11 +30,8 @@ type item struct {
 	value       interface{}
 }
 
-// EvictCallback called when a lru entry is evicted
-type EvictCallback func(key interface{}, value interface{})
-
 // NewLFU creates a new LFU cache with input size and onEvict function
-func NewLFU(size int, onEvict EvictCallback) (*LFU, error) {
+func NewLFU(size int, onEvict cache.EvictCallback) (*LFU, error) {
 	if size <= 0 {
 		return nil, errors.New("invalid cache size")
 	}
@@ -50,7 +48,6 @@ func (lfu *LFU) Add(key, value interface{}) (found, evicted bool) {
 	// if found, update value
 	if it, found := lfu.pairs[key]; found {
 		lfu.updateFreq(it)
-		it.key = key
 		it.value = value
 		return true, false
 	}
@@ -61,7 +58,6 @@ func (lfu *LFU) Add(key, value interface{}) (found, evicted bool) {
 	// eviction occurred
 	if evicted {
 		lfu.removeLeastUsed()
-		return false, true
 	}
 
 	// add new item
@@ -73,7 +69,7 @@ func (lfu *LFU) Add(key, value interface{}) (found, evicted bool) {
 	lfu.updateFreq(nit)
 	lfu.pairs[key] = nit
 
-	return false, false
+	return false, evicted
 }
 
 // Get returns value if key and update timestamp

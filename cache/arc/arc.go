@@ -3,6 +3,7 @@ package arc
 import (
 	"container/list"
 	"errors"
+	"goContainer/cache"
 )
 
 // ARC struct for adaptive replacement cache
@@ -28,7 +29,7 @@ type ARC struct {
 
 	p int // for partition
 
-	onEvict EvictCallback
+	onEvict cache.EvictCallback
 }
 
 type item struct {
@@ -36,11 +37,8 @@ type item struct {
 	value interface{}
 }
 
-// EvictCallback called when a lru entry is evicted
-type EvictCallback func(key interface{}, value interface{})
-
 // NewARC creates a new ARC cache with input size and onEvict function
-func NewARC(size int, onEvict EvictCallback) (*ARC, error) {
+func NewARC(size int, onEvict cache.EvictCallback) (*ARC, error) {
 	if size <= 0 {
 		return nil, errors.New("invalid cache size")
 	}
@@ -244,7 +242,10 @@ func (arc *ARC) updateKey(key interface{}) {
 	// The increments and the decrements are subject to the stipulation 0 ≤ p ≤ c
 
 	// If there is a hit in T1 or T2, do nothing
+	// do nothing -> not set p
+	// but move key from t1 to t2
 	if arc.t1.Contains(key) || arc.t2.Contains(key) {
+		arc.move(key)
 		return
 	}
 	// If there is a hit in B1
