@@ -2,7 +2,6 @@ package bufferedchan
 
 import (
 	"fmt"
-	"sync/atomic"
 	"goContainer/queue/deque"
 	"os"
 )
@@ -13,10 +12,9 @@ const AutoResize = -1
 // BufferedChan struct, just a simple toy, certainly should use make(chan interface, size)
 //	a buffered chan = two un-buffered chan + a goroutine + an array
 type BufferedChan struct {
-	in, out   chan interface{}
-	size int32
-	cap int
-	buf       *deque.Deque
+	in, out chan interface{}
+	cap     int
+	buf     *deque.Deque
 }
 
 // New creates a new buffered chan
@@ -29,11 +27,10 @@ func New(cap int) *BufferedChan {
 		_, _ = fmt.Fprintln(os.Stderr, "notice: channel buf size is unlimited now!")
 	}
 	bc := &BufferedChan{
-		in:   make(chan interface{}),
-		out:  make(chan interface{}),
-		size: 1,
-		cap:  cap,
-		buf:  deque.NewDeque(cap), // >= 8
+		in:  make(chan interface{}),
+		out: make(chan interface{}),
+		cap: cap,
+		buf: deque.NewDeque(cap), // >= 8
 	}
 	go bc.run()
 	return bc
@@ -50,8 +47,9 @@ func (bc *BufferedChan) Out() <-chan interface{} {
 }
 
 // Len returns number of elements in the channel
+//	notice: Not correct due to one elem may be put into out chan when buf is not empty, which makes len 1 smaller
 func (bc *BufferedChan) Len() int {
-	return int(atomic.LoadInt32(&bc.size))
+	return bc.buf.Size()
 }
 
 // Cap returns capacity of the channel
@@ -75,18 +73,16 @@ func (bc *BufferedChan) run() {
 
 	for in != nil || out != nil {
 		select {
-			case elt, open := <- in:
-				if open {
-					bc.buf.PushBack(elt)
-					atomic.AddInt32(&bc.size, 1)
-				} else {
-					// closed
-					in = nil
-					nextIn = nil
-				}
-			case out <- nextElt:
-				_, _ = bc.buf.PopFront()
-				atomic.AddInt32(&bc.size, -1)
+		case elt, open := <-in:
+			if open {
+				bc.buf.PushBack(elt)
+			} else {
+				// closed
+				in = nil
+				nextIn = nil
+			}
+		case out <- nextElt:
+			_, _ = bc.buf.PopFront()
 		}
 
 		if bc.buf.Empty() {
