@@ -2,6 +2,7 @@ package bufferedchan
 
 import (
 	"fmt"
+	"sync/atomic"
 	"goContainer/queue/deque"
 	"os"
 )
@@ -13,7 +14,7 @@ const AutoResize = -1
 //	a buffered chan = two un-buffered chan + a goroutine + an array
 type BufferedChan struct {
 	in, out   chan interface{}
-	size int
+	size int32
 	cap int
 	buf       *deque.Deque
 }
@@ -30,7 +31,7 @@ func New(cap int) *BufferedChan {
 	bc := &BufferedChan{
 		in:   make(chan interface{}),
 		out:  make(chan interface{}),
-		size: 0,
+		size: 1,
 		cap:  cap,
 		buf:  deque.NewDeque(cap), // >= 8
 	}
@@ -50,7 +51,7 @@ func (bc *BufferedChan) Out() <-chan interface{} {
 
 // Len returns number of elements in the channel
 func (bc *BufferedChan) Len() int {
-	return bc.size
+	return int(atomic.LoadInt32(&bc.size))
 }
 
 // Cap returns capacity of the channel
@@ -77,7 +78,7 @@ func (bc *BufferedChan) run() {
 			case elt, open := <- in:
 				if open {
 					bc.buf.PushBack(elt)
-					bc.size++
+					atomic.AddInt32(&bc.size, 1)
 				} else {
 					// closed
 					in = nil
@@ -85,7 +86,7 @@ func (bc *BufferedChan) run() {
 				}
 			case out <- nextElt:
 				_, _ = bc.buf.PopFront()
-				bc.size--
+				atomic.AddInt32(&bc.size, -1)
 		}
 
 		if bc.buf.Empty() {

@@ -10,9 +10,18 @@ func TestBufferedChan(t *testing.T) {
 	var _ chans.Interface = (*BufferedChan)(nil)
 
 	bc := New(1000)
-	testChan(t, "New BufferedChan", bc)
+	if bc.Cap() != 1000 {
+		t.Fatal(bc.Cap())
+	}
+	testChanLenCap(t, "New BufferedChan 1000", bc, 1000, 1000)
+
+	bc = New(1000)
+	testChan(t, "New BufferedChan 1000", bc)
 
 	bc = New(AutoResize)
+	if bc.Cap() != AutoResize {
+		t.Fatal(bc.Cap())
+	}
 	testChan(t, "New BufferedChan unlimited", bc)
 
 	bc = New(100)
@@ -20,6 +29,28 @@ func TestBufferedChan(t *testing.T) {
 
 	bc = New(100)
 	testChanConcurrent(t, "Concurrent BufferedChan", bc)
+}
+
+func testChanLenCap(t *testing.T, name string, ch chans.Interface, expectedLen, expectedCap int) {
+	data := make([]int, expectedLen)
+	for i := range data {
+		data[i] = utils.GenerateRandomInt()
+	}
+
+	for _, i := range data {
+		ch.In() <- i
+	}
+	ch.Close()
+
+	if ch.Len() != expectedLen || ch.Cap() != expectedCap {
+		t.Fatal("Test ", name, ": expectedLen ", expectedLen, " got ", ch.Len(), ", expectedCap ", expectedCap, " got ", ch.Cap())
+	}
+
+	for _, i := range data {
+		if num := <-ch.Out(); num.(int) != i {
+			t.Fatal("Test ", name, ": expected ", i, " got ", num.(int))
+		}
+	}
 }
 
 func testChan(t *testing.T, name string, ch chans.Interface) {
@@ -63,6 +94,7 @@ func testChanConcurrent(t *testing.T, name string, ch chans.Interface) {
 		}
 	}(data)
 
+	// check race condition
 	go ch.Len()
 	go ch.Cap()
 }
