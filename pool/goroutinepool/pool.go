@@ -46,7 +46,7 @@ type Task func()
 
 // New creates a new worker pool with input maxWorkers and a default timeout
 func New(maxWorkers int) *Pool {
-	return NewPool(maxWorkers, idleTimeoutSec * time.Second)
+	return NewPool(maxWorkers, idleTimeoutSec*time.Second)
 }
 
 // NewPool creates a new worker pool with input maxWorkers and timeout
@@ -54,7 +54,7 @@ func NewPool(maxWorkers int, timeout time.Duration) *Pool {
 	if maxWorkers < 1 {
 		maxWorkers = 1
 	}
-	if timeout < idleTimeoutSec * time.Second {
+	if timeout < idleTimeoutSec*time.Second {
 		timeout = idleTimeoutSec * time.Second
 	}
 
@@ -102,6 +102,15 @@ func (p *Pool) Process(payload interface{}, taskFunc func(payload interface{}) i
 		close(resChan)
 	})
 	return <-resChan
+}
+
+// ProcessAsync processes a payload asynchronously and put the result into resChan
+// just pass payload and func as closure
+func (p *Pool) ProcessAsync(payload interface{}, taskFunc func(payload interface{}) interface{}, resChan chan<- interface{}) {
+	p.Submit(func() {
+		resChan <- taskFunc(payload)
+		close(resChan)
+	})
 }
 
 // QueuedTaskNum returns number of waiting tasks
