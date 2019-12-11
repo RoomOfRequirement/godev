@@ -390,6 +390,25 @@ func TestProcessAsyncClosure(t *testing.T) {
 	wp.StopUntilAllDone()
 }
 
+func TestPool_ProcessFuture(t *testing.T) {
+	wp := New(10)
+	for i := 0; i < 10; i++ {
+		taskFunc := func(payload interface{}) interface{} {
+			sum := 0
+			for _, i := range payload.([]int) {
+				sum += i
+			}
+			return sum
+		}
+		future := wp.ProcessFuture([]int{1, 2, 3, 4, 5}, taskFunc)
+		s := future()
+		if s.(int) != 15 {
+			t.Fatal("Process Closure Wrong:\nexpected: ", 15, " got: ", s)
+		}
+	}
+	wp.StopUntilAllDone()
+}
+
 func anyReady(w *Pool) bool {
 	select {
 	case wkCh := <-w.readyWorkers:

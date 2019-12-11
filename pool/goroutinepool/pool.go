@@ -113,6 +113,18 @@ func (p *Pool) ProcessAsync(payload interface{}, taskFunc func(payload interface
 	})
 }
 
+// ProcessFuture simulate the Future idempotent by just simply wrapping un-buffered chan with a function
+func (p *Pool) ProcessFuture(payload interface{}, taskFunc func(payload interface{}) interface{}) (future func() interface{}) {
+	resChan := make(chan interface{})
+	p.Submit(func() {
+		resChan <- taskFunc(payload)
+		close(resChan)
+	})
+	return func() interface{} {
+		return <-resChan
+	}
+}
+
 // QueuedTaskNum returns number of waiting tasks
 func (p *Pool) QueuedTaskNum() int {
 	return int(atomic.LoadInt32(&p.queuedTaskNum))
