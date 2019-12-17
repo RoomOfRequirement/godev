@@ -57,6 +57,7 @@ func TestLoop_Simple(t *testing.T) {
 	}
 
 	l.Start()
+	l.Start()
 	time.Sleep(10 * time.Millisecond)
 	defer l.Stop()
 }
@@ -250,4 +251,4 @@ func call(m map[string]interface{}, name string, args ... interface{}) (result [
 	result = f.Call(in)
 	return
 }
- */
+*/

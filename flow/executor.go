@@ -98,6 +98,7 @@ Loop:
 			err = ctx.Err()
 			break Loop
 		default:
+			a := a
 			pe.p.Submit(func() {
 				res <- a.Execute(ctx)
 			})

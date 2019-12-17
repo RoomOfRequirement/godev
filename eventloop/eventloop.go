@@ -8,15 +8,16 @@ import (
 	"golang.org/x/sync/errgroup"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
 // Loop struct
 type Loop struct {
 	events    chan *Event
-	listeners map[string][]*EventListener
+	listeners *eventListenerMap
 
-	running bool
+	running uint32
 	logger  *zap.Logger
 	wg      sync.WaitGroup
 }
@@ -29,17 +30,25 @@ type EventListener struct {
 	expired     bool
 }
 
+type eventListenerMap struct {
+	lock sync.RWMutex
+	m    map[string][]*EventListener
+}
+
 // NewLoop creates a new event loop
 func NewLoop(bufferedEvents int, logLevel string) EventLoop {
 	if bufferedEvents < 0 {
 		panic("invalid buffered events size")
 	}
 	return &Loop{
-		events:    make(chan *Event, bufferedEvents),
-		listeners: make(map[string][]*EventListener),
-		running:   false,
-		logger:    newLogger(logLevel),
-		wg:        sync.WaitGroup{},
+		events: make(chan *Event, bufferedEvents),
+		listeners: &eventListenerMap{
+			lock: sync.RWMutex{},
+			m:    make(map[string][]*EventListener),
+		},
+		running: 0,
+		logger:  newLogger(logLevel),
+		wg:      sync.WaitGroup{},
 	}
 }
 
@@ -58,41 +67,56 @@ func (l *Loop) Emit(eventName string, data interface{}) {
 
 // Start starts the event loop
 func (l *Loop) Start() {
+	if atomic.LoadUint32(&l.running) != 0 {
+		l.logger.Info("Loop already running")
+		return
+	}
 	l.logger.Info("Loop starting")
-	l.running = true
+	atomic.StoreUint32(&l.running, 1)
 	l.wg.Add(1)
-	grp, ctx := errgroup.WithContext(context.Background())
 
 	go func() {
 		l.logger.Info("Loop listening")
 		var err error
+		grp, ctx := errgroup.WithContext(context.Background())
 
-		for l.running {
+		for atomic.LoadUint32(&l.running) != 0 {
 			select {
+			case <-ctx.Done():
+				err = ctx.Err()
 			case event := <-l.events:
 				l.logger.Debug("Event received", zap.String("name", event.Name), zap.Any("data", event.Data))
 				var removedListener []*EventListener
 
-				for _, listener := range l.listeners[event.Name] {
+				l.listeners.lock.RLock()
+				for _, listener := range l.listeners.m[event.Name] {
 					if listener.timeout != 0 && listener.expiredTime.Before(time.Now()) {
 						l.logger.Info("listener expired", zap.String("name", event.Name))
 						listener.expired = true
 						removedListener = append(removedListener, listener)
 						continue
+					} else {
+						// closure
+						listener, event := listener, event
+						grp.Go(func() error {
+							return listener.callback(ctx, event.Data)
+						})
 					}
-					grp.Go(func() error {
-						return listener.callback(ctx, event.Data.(interface{}))
-					})
 				}
+				l.listeners.lock.RUnlock()
 
 				if len(removedListener) > 0 {
 					var listeners []*EventListener
-					for _, listener := range l.listeners[event.Name] {
+					l.listeners.lock.RLock()
+					for _, listener := range l.listeners.m[event.Name] {
 						if !listener.expired {
 							listeners = append(listeners, listener)
 						}
 					}
-					l.listeners[event.Name] = listeners
+					l.listeners.lock.RUnlock()
+					l.listeners.lock.Lock()
+					l.listeners.m[event.Name] = listeners
+					l.listeners.lock.Unlock()
 				}
 
 				err = grp.Wait()
@@ -103,7 +127,7 @@ func (l *Loop) Start() {
 
 			if err != nil {
 				l.logger.Error("Event error", zap.String("error", err.Error()))
-				l.running = false
+				atomic.StoreUint32(&l.running, 0)
 			}
 		}
 
@@ -114,7 +138,7 @@ func (l *Loop) Start() {
 // Stop stops event loop
 func (l *Loop) Stop() {
 	l.logger.Info("Loop stopping")
-	l.running = false
+	atomic.StoreUint32(&l.running, 0)
 	l.logger.Debug("Waiting for loop stopped")
 	close(l.events)
 	l.wg.Wait()
@@ -126,15 +150,17 @@ func (l *Loop) addEventListener(eventName string, callback Callback, timeout tim
 		return errors.New("invalid nil callback")
 	}
 
-	if _, found := l.listeners[eventName]; !found {
-		l.listeners[eventName] = []*EventListener{}
+	l.listeners.lock.Lock()
+	if _, found := l.listeners.m[eventName]; !found {
+		l.listeners.m[eventName] = []*EventListener{}
 	}
-	l.listeners[eventName] = append(l.listeners[eventName], &EventListener{
+	l.listeners.m[eventName] = append(l.listeners.m[eventName], &EventListener{
 		callback:    callback,
 		timeout:     timeout,
 		expiredTime: time.Now().Add(timeout),
 		expired:     false,
 	})
+	l.listeners.lock.Unlock()
 
 	return nil
 }

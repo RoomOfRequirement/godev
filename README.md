@@ -10,3 +10,5 @@
 [![](https://godoc.org/github.com/Harold2017/goContainer?status.svg)](https://godoc.org/github.com/Harold2017/golina)
 
 A repo for studying various data structure and algorithm in golang.
+
+Notice: cache package may not thread safe, you should always try test `-race`.
