@@ -3,9 +3,11 @@ package lock
 import (
 	"io"
 	"syscall"
+	"time"
 )
 
 // FdLock struct
+//	https://linux.die.net/man/2/flock
 type FdLock struct {
 	fd int
 }
@@ -29,34 +31,62 @@ func NewFdLock(fd int) (*FdLock, error) {
 
 // Lock adds write lock
 func (fl *FdLock) Lock() error {
-	if err := syscall.Flock(fl.fd, syscall.LOCK_EX); err != nil {
-		return err
-	}
-	return nil
+	return syscall.Flock(fl.fd, syscall.LOCK_EX)
+}
+
+// TryLock used for some non-blocking case
+func (fl *FdLock) TryLock() (bool, error) {
+	return fl.try(syscall.LOCK_EX)
+}
+
+// TryLockWithTimeout keeps trying to get Lock until timeout
+func (fl *FdLock) TryLockWithTimeout(timeout time.Duration) (bool, error) {
+	return fl.tryWithTimeout(syscall.LOCK_EX, timeout)
+}
+
+// RetryLock keeps retrying to get Lock with delay until cancel
+func (fl *FdLock) RetryLock(cancel chan struct{}, delay time.Duration) (bool, error) {
+	return fl.retry(syscall.LOCK_EX, cancel, delay)
+}
+
+// RetryLockWithTimeout keeps retrying to get Lock with delay until cancel or timeout
+func (fl *FdLock) RetryLockWithTimeout(cancel chan struct{}, delay, timeout time.Duration) (bool, error) {
+	return fl.retryWithTimeout(syscall.LOCK_EX, cancel, delay, timeout)
 }
 
 // Unlock removes write lock
 func (fl *FdLock) Unlock() error {
-	if err := syscall.Flock(fl.fd, syscall.LOCK_UN); err != nil {
-		return err
-	}
-	return nil
+	return syscall.Flock(fl.fd, syscall.LOCK_UN)
 }
 
 // RLock adds read lock
 func (fl *FdLock) RLock() error {
-	if err := syscall.Flock(fl.fd, syscall.LOCK_SH); err != nil {
-		return err
-	}
-	return nil
+	return syscall.Flock(fl.fd, syscall.LOCK_SH)
+}
+
+// TryRLock used for some non-blocking case
+func (fl *FdLock) TryRLock() (bool, error) {
+	return fl.try(syscall.LOCK_SH)
+}
+
+// TryRLockWithTimeout keeps trying to get RLock until timeout
+func (fl *FdLock) TryRLockWithTimeout(timeout time.Duration) (bool, error) {
+	return fl.tryWithTimeout(syscall.LOCK_SH, timeout)
+}
+
+// RetryRLock keeps retrying to get RLock with delay until cancel
+func (fl *FdLock) RetryRLock(cancel chan struct{}, delay time.Duration) (bool, error) {
+	return fl.retry(syscall.LOCK_SH, cancel, delay)
+}
+
+// RetryRLockWithTimeout keeps retrying to get Lock with delay until cancel or timeout
+func (fl *FdLock) RetryRLockWithTimeout(cancel chan struct{}, delay, timeout time.Duration) (bool, error) {
+	return fl.retryWithTimeout(syscall.LOCK_SH, cancel, delay, timeout)
 }
 
 // RUnlock removes a read lock
 func (fl *FdLock) RUnlock() error {
-	if err := syscall.Flock(fl.fd, syscall.LOCK_UN); err != nil {
-		return err
-	}
-	return nil
+	return syscall.Flock(fl.fd, syscall.LOCK_UN)
 }
 
 // Close unlocks fd and closes it
@@ -65,4 +95,62 @@ func (fl *FdLock) Close() error {
 		return err
 	}
 	return syscall.Close(fl.fd)
+}
+
+func (fl *FdLock) try(flag int) (bool, error) {
+	// LOCK_NB -> non-blocking flag
+	err := syscall.Flock(fl.fd, flag|syscall.LOCK_NB)
+
+	switch err {
+	case syscall.EWOULDBLOCK: // already locked
+		return false, nil
+	case nil:
+		return true, nil
+	}
+	return false, err
+}
+
+func (fl *FdLock) tryWithTimeout(flag int, timeout time.Duration) (bool, error) {
+	timer := time.NewTimer(timeout)
+	for {
+		select {
+		case <-timer.C:
+			timer.Stop()
+			return false, nil
+		default:
+			if ok, err := fl.try(flag); ok || err != nil {
+				return ok, err
+			}
+		}
+	}
+}
+
+func (fl *FdLock) retry(flag int, cancel chan struct{}, delay time.Duration) (bool, error) {
+	for {
+		select {
+		case <-cancel:
+			return false, nil
+		case <-time.After(delay):
+			if ok, err := fl.try(flag); ok || err != nil {
+				return ok, err
+			}
+		}
+	}
+}
+
+func (fl *FdLock) retryWithTimeout(flag int, cancel chan struct{}, delay, timeout time.Duration) (bool, error) {
+	timer := time.NewTimer(timeout)
+	for {
+		select {
+		case <-cancel:
+			return false, nil
+		case <-time.After(delay):
+			if ok, err := fl.try(flag); ok || err != nil {
+				return ok, err
+			}
+		case <-timer.C:
+			timer.Stop()
+			return false, nil
+		}
+	}
 }
