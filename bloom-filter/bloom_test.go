@@ -2,14 +2,14 @@ package bloomfilter
 
 import (
 	"fmt"
-	container "goContainer"
+	"goContainer/basic"
 	"goContainer/utils"
 	"strconv"
 	"testing"
 )
 
 func TestBloomFilter(t *testing.T) {
-	var _ container.Container = (*BloomFilter)(nil)
+	var _ basic.Container = (*BloomFilter)(nil)
 	n, p := 1000, 0.01
 	bf := NewBloomFilter(uint(n), p)
 	if bf.Empty() {

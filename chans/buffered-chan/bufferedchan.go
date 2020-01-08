@@ -2,7 +2,7 @@ package bufferedchan
 
 import (
 	"fmt"
-	"goContainer/queue/deque"
+	"goContainer/basic/datastructure/queue/deque"
 	"os"
 )
 
