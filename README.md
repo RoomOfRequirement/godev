@@ -9,6 +9,8 @@
 ![License](https://img.shields.io/github/license/Harold2017/goContainer)
 [![](https://godoc.org/github.com/Harold2017/goContainer?status.svg)](https://godoc.org/github.com/Harold2017/golina)
 
-A repo for studying various data structure and algorithm in golang.
+`basic` repo for studying various data structure and algorithm in golang.
 
-Notice: cache package may not thread safe, you should always try test `-race`.
+others contains code snippets i used in daily development.
+
+Notice: some package may not thread safe, you should always try test `-race`.
