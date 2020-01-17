@@ -1,7 +1,7 @@
 package bidirectionalmap
 
 import (
-	"goContainer/basic/datastructure/maps"
+	"godev/basic/datastructure/maps"
 )
 
 // BidirectionalMap struct

@@ -1,4 +1,4 @@
-module goContainer
+module godev
 
 go 1.12
 

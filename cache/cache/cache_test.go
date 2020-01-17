@@ -2,8 +2,8 @@ package cache
 
 import (
 	"fmt"
-	"goContainer/cache"
-	"goContainer/utils"
+	"godev/cache"
+	"godev/utils"
 	"math/rand"
 	"testing"
 	"time"

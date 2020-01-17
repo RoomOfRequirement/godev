@@ -1,8 +1,8 @@
 package resizablechan
 
 import (
-	"goContainer/chans"
-	"goContainer/utils"
+	"godev/chans"
+	"godev/utils"
 	"testing"
 )
 

@@ -2,8 +2,8 @@ package avltree
 
 import (
 	"fmt"
-	"goContainer/basic"
-	"goContainer/basic/datastructure/tree"
+	"godev/basic"
+	"godev/basic/datastructure/tree"
 	"testing"
 )
 

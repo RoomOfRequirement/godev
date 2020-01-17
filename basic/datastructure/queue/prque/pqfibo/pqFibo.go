@@ -1,12 +1,12 @@
 package pqfibo
 
 import (
-	heap2 "goContainer/basic/datastructure/heap"
-	fibonacci2 "goContainer/basic/datastructure/heap/fibonacci"
+	heap2 "godev/basic/datastructure/heap"
+	fibonacci2 "godev/basic/datastructure/heap/fibonacci"
 )
 
 // PQFib priority queue based on fibonacci heap
-//	https://github.com/Harold2017/goContainer/tree/master/heap/fibonacci
+//	https://github.com/Harold2017/godev/tree/master/heap/fibonacci
 type PQFib struct {
 	items *fibonacci2.Heap
 }

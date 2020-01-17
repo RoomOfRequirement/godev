@@ -1,8 +1,8 @@
 package shortestpath
 
 import (
-	"goContainer/basic/datastructure/graph"
-	"goContainer/basic/datastructure/heap/bheap"
+	"godev/basic/datastructure/graph"
+	"godev/basic/datastructure/heap/bheap"
 )
 
 // AStar algorithm
@@ -10,7 +10,7 @@ import (
 //	https://www.redblobgames.com/pathfinding/a-star/introduction.html
 func AStar(g graph.Graph, source, target graph.ID) ([]graph.ID, map[graph.ID]float64, error) {
 	// Q (dist queue): set of all vertices
-	//	based on heap: https://github.com/Harold2017/goContainer/tree/master/heap/bheap
+	//	based on heap: https://github.com/Harold2017/godev/tree/master/heap/bheap
 	//	use this heap because fibonacci heap `Update` method (based on `decreaseKey` / `increaseKey`) takes large overhead
 	Q := newPQ()
 	// prev vertex map

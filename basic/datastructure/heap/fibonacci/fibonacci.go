@@ -2,7 +2,7 @@ package fibonacci
 
 import (
 	"fmt"
-	"goContainer/basic/datastructure/heap"
+	"godev/basic/datastructure/heap"
 	"math"
 )
 

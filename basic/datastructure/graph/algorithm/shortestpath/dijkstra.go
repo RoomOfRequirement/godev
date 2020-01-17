@@ -1,16 +1,16 @@
 package shortestpath
 
 import (
-	"goContainer/basic/datastructure/graph"
-	"goContainer/basic/datastructure/heap"
-	"goContainer/basic/datastructure/heap/fibonacci"
-	"goContainer/basic/datastructure/queue/deque"
+	"godev/basic/datastructure/graph"
+	"godev/basic/datastructure/heap"
+	"godev/basic/datastructure/heap/fibonacci"
+	"godev/basic/datastructure/queue/deque"
 	"math"
 )
 
 // Dijkstra algorithm
 //	https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
-//	use priority queue (minimum heap) (fibonacci heap: https://github.com/Harold2017/goContainer/tree/master/queue/prque/pqfibo)
+//	use priority queue (minimum heap) (fibonacci heap: https://github.com/Harold2017/godev/tree/master/queue/prque/pqfibo)
 func Dijkstra(g graph.Graph, source, target graph.ID) ([]graph.ID, map[graph.ID]float64, error) {
 	// Q (dist queue): set of all vertices
 	Q := newPQFib()

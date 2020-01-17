@@ -1,8 +1,8 @@
 package pairing
 
 import (
-	"goContainer/basic/datastructure/heap"
-	"goContainer/utils"
+	"godev/basic/datastructure/heap"
+	"godev/utils"
 	"testing"
 )
 

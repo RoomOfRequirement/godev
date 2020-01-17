@@ -2,8 +2,8 @@ package shortestpath
 
 import (
 	"fmt"
-	"goContainer/basic/datastructure/graph"
-	"goContainer/basic/datastructure/heap/bheap"
+	"godev/basic/datastructure/graph"
+	"godev/basic/datastructure/heap/bheap"
 	"math"
 )
 

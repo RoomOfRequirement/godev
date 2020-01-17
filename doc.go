@@ -1,2 +1,2 @@
-// Package container provides some useful containers
-package container
+// Package godev provides some useful code snippets
+package godev

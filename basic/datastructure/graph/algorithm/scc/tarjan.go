@@ -1,7 +1,7 @@
 package scc
 
 import (
-	"goContainer/basic/datastructure/graph"
+	"godev/basic/datastructure/graph"
 )
 
 // Tarjan algorithm

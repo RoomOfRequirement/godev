@@ -1,9 +1,9 @@
 package treemap
 
 import (
-	"goContainer/basic"
-	"goContainer/basic/datastructure/maps"
-	"goContainer/basic/datastructure/tree/rbtree"
+	"godev/basic"
+	"godev/basic/datastructure/maps"
+	"godev/basic/datastructure/tree/rbtree"
 )
 
 // Map based on red-black tree

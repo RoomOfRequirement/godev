@@ -2,10 +2,10 @@ package cache
 
 import (
 	"errors"
-	"goContainer/cache"
-	"goContainer/cache/arc"
-	"goContainer/cache/lfu"
-	"goContainer/cache/lru"
+	"godev/cache"
+	"godev/cache/arc"
+	"godev/cache/lfu"
+	"godev/cache/lru"
 	"sync"
 )
 

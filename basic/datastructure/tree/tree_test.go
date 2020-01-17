@@ -1,12 +1,12 @@
 package tree
 
 import (
-	"goContainer/basic"
-	bheap2 "goContainer/basic/datastructure/heap/bheap"
-	"goContainer/basic/datastructure/tree/btree"
-	"goContainer/basic/datastructure/tree/rbtree"
-	"goContainer/basic/datastructure/tree/splaytree"
-	"goContainer/utils"
+	"godev/basic"
+	bheap2 "godev/basic/datastructure/heap/bheap"
+	"godev/basic/datastructure/tree/btree"
+	"godev/basic/datastructure/tree/rbtree"
+	"godev/basic/datastructure/tree/splaytree"
+	"godev/utils"
 	"testing"
 )
 

@@ -1,12 +1,12 @@
 package concurrent
 
 import (
-	"goContainer/basic/datastructure/queue/deque"
+	"godev/basic/datastructure/queue/deque"
 	"sync"
 )
 
 // DequeRW is implemented on top of deque
-//	see it in `https://github.com/Harold2017/goContainer/tree/master/queue/deque`
+//	see it in `https://github.com/Harold2017/godev/tree/master/queue/deque`
 type DequeRW struct {
 	dq   *deque.Deque
 	lock sync.RWMutex

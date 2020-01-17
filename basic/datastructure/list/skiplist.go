@@ -1,7 +1,7 @@
 package list
 
 import (
-	"goContainer/basic"
+	"godev/basic"
 	"math/rand"
 )
 

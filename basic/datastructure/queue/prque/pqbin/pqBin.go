@@ -1,11 +1,11 @@
 package pqbin
 
 import (
-	bheap2 "goContainer/basic/datastructure/heap/bheap"
+	bheap2 "godev/basic/datastructure/heap/bheap"
 )
 
 // PQBin priority queue based on binary heap, implements golang heap.Interface (Sort.Interface)
-//	https://github.com/Harold2017/goContainer/tree/master/heap/bheap
+//	https://github.com/Harold2017/godev/tree/master/heap/bheap
 type PQBin struct {
 	items *bheap2.MaxHeap
 }

@@ -1,6 +1,6 @@
 package knapsack01
 
-import "goContainer/basic/datastructure/bits"
+import "godev/basic/datastructure/bits"
 
 // 0-1 knapsack problem
 //	https://en.wikipedia.org/wiki/Knapsack_problem

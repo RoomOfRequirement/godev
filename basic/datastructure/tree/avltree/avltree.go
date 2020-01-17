@@ -1,7 +1,7 @@
 package avltree
 
 import (
-	"goContainer/basic"
+	"godev/basic"
 )
 
 // AVLTree struct

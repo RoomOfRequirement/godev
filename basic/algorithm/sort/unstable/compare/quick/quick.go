@@ -1,7 +1,7 @@
 package quick
 
 import (
-	"goContainer/basic/algorithm/sort"
+	"godev/basic/algorithm/sort"
 )
 
 // Sort implements quick sort in place

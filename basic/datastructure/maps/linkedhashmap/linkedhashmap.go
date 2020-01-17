@@ -2,7 +2,7 @@ package linkedhashmap
 
 import (
 	"container/list"
-	"goContainer/basic/datastructure/maps"
+	"godev/basic/datastructure/maps"
 )
 
 type item struct {

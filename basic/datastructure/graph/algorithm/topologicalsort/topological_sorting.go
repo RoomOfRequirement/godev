@@ -2,8 +2,8 @@ package topologicalsort
 
 import (
 	"fmt"
-	"goContainer/basic/datastructure/graph"
-	"goContainer/basic/datastructure/queue/deque"
+	"godev/basic/datastructure/graph"
+	"godev/basic/datastructure/queue/deque"
 )
 
 // Kahn algorithm

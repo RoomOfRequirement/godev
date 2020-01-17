@@ -1,7 +1,7 @@
 package insertion
 
 import (
-	"goContainer/basic/algorithm/sort"
+	"godev/basic/algorithm/sort"
 )
 
 // Sort implements insertion sort

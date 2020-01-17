@@ -1,8 +1,8 @@
 package fibonacci
 
 import (
-	"goContainer/basic/datastructure/heap"
-	"goContainer/utils"
+	"godev/basic/datastructure/heap"
+	"godev/utils"
 	"math"
 	"strconv"
 	"testing"

@@ -3,7 +3,7 @@ package lfu
 import (
 	"container/list"
 	"errors"
-	"goContainer/cache"
+	"godev/cache"
 )
 
 // LFU struct (least frequently used)

@@ -2,8 +2,8 @@ package lfu
 
 import (
 	"fmt"
-	"goContainer/cache"
-	"goContainer/utils"
+	"godev/cache"
+	"godev/utils"
 	"testing"
 )
 

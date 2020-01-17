@@ -2,7 +2,7 @@ package topologicalsort
 
 import (
 	"fmt"
-	"goContainer/basic/datastructure/graph"
+	"godev/basic/datastructure/graph"
 	"testing"
 )
 

@@ -1,7 +1,7 @@
 package tree
 
 import (
-	"goContainer/basic"
+	"godev/basic"
 )
 
 // Tree interface

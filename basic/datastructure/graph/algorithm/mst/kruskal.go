@@ -1,7 +1,7 @@
 package mst
 
 import (
-	"goContainer/basic/datastructure/graph"
+	"godev/basic/datastructure/graph"
 	"sort"
 )
 

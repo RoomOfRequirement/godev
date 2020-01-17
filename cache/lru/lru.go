@@ -3,7 +3,7 @@ package lru
 import (
 	"container/list"
 	"errors"
-	"goContainer/cache"
+	"godev/cache"
 )
 
 // LRU struct
@@ -11,7 +11,7 @@ type LRU struct {
 	size int
 
 	// evicts and pairs consist of linked hash map
-	//	see https://github.com/Harold2017/GoContainer/blob/master/maps/linkedhashmap/linkedhashmap.go
+	//	see https://github.com/Harold2017/godev/blob/master/maps/linkedhashmap/linkedhashmap.go
 	evicts *list.List
 	pairs  map[interface{}]*item
 

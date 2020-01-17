@@ -2,8 +2,8 @@ package bloomfilter
 
 import (
 	"fmt"
-	"goContainer/basic"
-	"goContainer/utils"
+	"godev/basic"
+	"godev/utils"
 	"strconv"
 	"testing"
 )

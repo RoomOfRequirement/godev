@@ -2,7 +2,7 @@ package bstree
 
 import (
 	"fmt"
-	"goContainer/basic"
+	"godev/basic"
 )
 
 // BSTree Binary Search Tree

@@ -1,9 +1,9 @@
 package mst
 
 import (
-	"goContainer/basic/datastructure/graph"
-	"goContainer/basic/datastructure/heap"
-	"goContainer/basic/datastructure/heap/fibonacci"
+	"godev/basic/datastructure/graph"
+	"godev/basic/datastructure/heap"
+	"godev/basic/datastructure/heap/fibonacci"
 	"math"
 )
 

@@ -3,7 +3,7 @@ package resizablechan
 import (
 	"errors"
 	"fmt"
-	"goContainer/basic/datastructure/queue/deque"
+	"godev/basic/datastructure/queue/deque"
 	"os"
 )
 

@@ -2,7 +2,7 @@ package traversal
 
 import (
 	"fmt"
-	"goContainer/basic/datastructure/graph"
+	"godev/basic/datastructure/graph"
 )
 
 // BFS breadth first search

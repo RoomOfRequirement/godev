@@ -2,7 +2,7 @@ package splaytree
 
 import (
 	"fmt"
-	"goContainer/basic"
+	"godev/basic"
 )
 
 // references:

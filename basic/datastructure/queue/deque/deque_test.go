@@ -2,8 +2,8 @@ package deque
 
 import (
 	"fmt"
-	"goContainer/basic"
-	"goContainer/utils"
+	"godev/basic"
+	"godev/utils"
 	"math"
 	"strconv"
 	"testing"

@@ -1,7 +1,7 @@
 package counting
 
 import (
-	"goContainer/basic/algorithm/sort"
+	"godev/basic/algorithm/sort"
 )
 
 // Sort implements counting sort, useful for uniformly distributed data over a range

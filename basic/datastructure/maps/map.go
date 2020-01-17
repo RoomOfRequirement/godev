@@ -1,7 +1,7 @@
 package maps
 
 import (
-	"goContainer/basic"
+	"godev/basic"
 )
 
 // Map interface

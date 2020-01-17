@@ -1,7 +1,7 @@
 package comb
 
 import (
-	"goContainer/basic/algorithm/sort"
+	"godev/basic/algorithm/sort"
 )
 
 // Sort implements comb sort

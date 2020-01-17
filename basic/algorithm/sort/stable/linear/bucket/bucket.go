@@ -1,8 +1,8 @@
 package bucket
 
 import (
-	"goContainer/basic/algorithm/sort"
-	"goContainer/basic/algorithm/sort/stable/compare/insertion"
+	"godev/basic/algorithm/sort"
+	"godev/basic/algorithm/sort/stable/compare/insertion"
 )
 
 // Sort implements bucket (bin) sort, useful for uniformly distributed data over a range

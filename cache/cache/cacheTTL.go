@@ -2,8 +2,8 @@ package cache
 
 import (
 	"fmt"
-	"goContainer/cache"
-	"goContainer/cache/lru"
+	"godev/cache"
+	"godev/cache/lru"
 	"os"
 	"sync"
 	"time"

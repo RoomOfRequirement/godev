@@ -2,9 +2,9 @@ package treemap
 
 import (
 	"fmt"
-	"goContainer/basic"
-	"goContainer/basic/datastructure/maps"
-	"goContainer/utils"
+	"godev/basic"
+	"godev/basic/datastructure/maps"
+	"godev/utils"
 	"testing"
 )
 

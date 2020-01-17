@@ -1,7 +1,7 @@
 package shortestpath
 
 import (
-	"goContainer/basic/datastructure/graph"
+	"godev/basic/datastructure/graph"
 )
 
 // GreedyBestFirstSearch (heuristic search)

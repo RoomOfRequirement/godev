@@ -1,8 +1,8 @@
 package list
 
 import (
-	"goContainer/basic"
-	"goContainer/utils"
+	"godev/basic"
+	"godev/utils"
 	"math"
 	"testing"
 )

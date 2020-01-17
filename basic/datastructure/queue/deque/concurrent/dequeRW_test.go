@@ -2,8 +2,8 @@ package concurrent
 
 import (
 	"fmt"
-	"goContainer/basic"
-	"goContainer/basic/datastructure/queue/deque"
+	"godev/basic"
+	"godev/basic/datastructure/queue/deque"
 	"sync"
 	"testing"
 )

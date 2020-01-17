@@ -1,8 +1,8 @@
 package heap
 
 import (
-	sort2 "goContainer/basic/algorithm/sort"
-	"goContainer/utils"
+	sort2 "godev/basic/algorithm/sort"
+	"godev/utils"
 	"sort"
 	"testing"
 )

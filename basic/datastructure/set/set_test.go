@@ -1,7 +1,7 @@
 package set
 
 import (
-	"goContainer/basic"
+	"godev/basic"
 	"testing"
 )
 

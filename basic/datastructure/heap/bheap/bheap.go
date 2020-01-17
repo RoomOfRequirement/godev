@@ -2,7 +2,7 @@ package bheap
 
 import (
 	"container/heap"
-	"goContainer/basic"
+	"godev/basic"
 )
 
 // Heap use heap interface from "container/heap"

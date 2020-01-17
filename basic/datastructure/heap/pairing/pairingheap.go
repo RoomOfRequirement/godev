@@ -1,7 +1,7 @@
 package pairing
 
 import (
-	"goContainer/basic/datastructure/heap"
+	"godev/basic/datastructure/heap"
 )
 
 // node consists of Pairing Heap, used internally
