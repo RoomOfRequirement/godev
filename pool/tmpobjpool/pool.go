@@ -22,7 +22,7 @@ func (p *Pool) AddSize(size int) {
 }
 
 // Get gets a obj container with input size
-func (p *Pool) Get(size int) (interface{}) {
+func (p *Pool) Get(size int) interface{} {
 	if pool := p.pool[size]; pool != nil {
 		return pool.Get()
 	}
