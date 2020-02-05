@@ -14,3 +14,14 @@ func Shuffle(str string, rSrc rand.Source) string {
 	})
 	return strings.Join(words, " ")
 }
+
+// ShuffleStrs shuffles input strs
+func ShuffleStrs(strs []string, rSrc rand.Source) []string {
+	r := rand.New(rSrc)
+	l := len(strs)
+	ret := make([]string, len(strs))
+	for i, v := range r.Perm(l) {
+		ret[v] = strs[i]
+	}
+	return ret
+}

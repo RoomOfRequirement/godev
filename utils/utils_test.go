@@ -83,5 +83,5 @@ func TestPartialFunc(t *testing.T) {
 		"b": "2",
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "a1b2", resSlice[0].String())
+	assert.True(t, resSlice[0].String() == "a1b2" || resSlice[0].String() == "b2a1")
 }
