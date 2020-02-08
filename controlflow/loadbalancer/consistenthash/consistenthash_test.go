@@ -1,4 +1,4 @@
-package loadbalancer
+package consistenthash
 
 import (
 	"encoding/base64"

@@ -1,5 +1,7 @@
 package loadbalancer
 
+import "godev/controlflow/loadbalancer/consistenthash"
+
 // LoadBalancer interface
 type LoadBalancer interface {
 	Select(nodes []string, key string) (selectedNode string, err error)
@@ -7,7 +9,7 @@ type LoadBalancer interface {
 
 type loadBalancer struct {
 	nodes []string
-	ch    *ConsistentHash
+	ch    *consistenthash.ConsistentHash
 }
 
 func (lb *loadBalancer) Select(nodes []string, key string) (selectedNode string, err error) {
@@ -20,6 +22,6 @@ func (lb *loadBalancer) Select(nodes []string, key string) (selectedNode string,
 func NewWithConsistentHash() LoadBalancer {
 	return &loadBalancer{
 		nodes: nil,
-		ch:    NewCH(nil),
+		ch:    consistenthash.NewCH(nil),
 	}
 }
