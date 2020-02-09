@@ -1,5 +1,5 @@
 test:
-	go test ./... -coverprofile=coverage.out -covermode=atomic
+	go test `go list ./... | grep -v examples` -coverprofile=coverage.txt -covermode=atomic
 	go tool cover -func=coverage.out
 
 bench:
