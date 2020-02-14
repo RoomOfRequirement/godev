@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"math"
 	"strconv"
 	"testing"
@@ -47,6 +49,11 @@ func TestGenerateRandomIntInRange(t *testing.T) {
 	if n < s || n >= e {
 		t.Fail()
 	}
+
+	n = GenerateRandomIntInRange(e, s)
+	if n < s || n >= e {
+		t.Fail()
+	}
 }
 
 func TestGenerateRandomString(t *testing.T) {
@@ -84,4 +91,23 @@ func TestPartialFunc(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.True(t, resSlice[0].String() == "a1b2" || resSlice[0].String() == "b2a1")
+}
+
+func TestTrace(t *testing.T) {
+	panicFunc := func() interface{} {
+		panic("hi, panic here, need help")
+		return nil
+	}
+	call := func() interface{} {
+		defer func() {
+			if err := recover(); err != nil {
+				message := fmt.Sprintf("%s", err)
+				log.Println(Trace(message))
+			}
+		}()
+		return panicFunc()
+	}
+	assert.NotPanics(t, func() {
+		call()
+	})
 }
