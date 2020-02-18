@@ -1,12 +1,7 @@
 package utils
 
 import (
-	"errors"
-	"fmt"
 	"math/rand"
-	"reflect"
-	"runtime"
-	"strings"
 	"time"
 	"unsafe"
 )
@@ -55,42 +50,4 @@ func GenerateRandomString(length int) string {
 	}
 
 	return *(*string)(unsafe.Pointer(&s))
-}
-
-// PartialFunc based on reflect
-func PartialFunc(funcMap map[string]interface{}, funcName string, funcArgs ...interface{}) (resSlice []reflect.Value, err error) {
-	f := reflect.ValueOf(funcMap[funcName])
-	if len(funcArgs) != f.Type().NumIn() {
-		err = errors.New("invalid number of funcArgs")
-		return
-	}
-	in := make([]reflect.Value, len(funcArgs))
-	for idx, arg := range funcArgs {
-		in[idx] = reflect.ValueOf(arg)
-	}
-	resSlice = f.Call(in)
-	return
-}
-
-// Trace gets goroutine stack info
-/*	use it in defer func with panic recovery:
-	defer func() {
-		if err := recover(); err != nil {
-			message := fmt.Sprintf("%s", err)
-			log.Println(Trace(message))
-		}
-	}
-*/
-func Trace(message string) string {
-	var pcs [32]uintptr
-	n := runtime.Callers(3, pcs[:]) // skip first 3 caller
-
-	var str strings.Builder
-	str.WriteString(message + "\nTraceback:")
-	for _, pc := range pcs[:n] {
-		fn := runtime.FuncForPC(pc)
-		file, line := fn.FileLine(pc)
-		str.WriteString(fmt.Sprintf("\n\t%s:%d", file, line))
-	}
-	return str.String()
 }
