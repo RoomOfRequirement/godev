@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
+	"log"
 	"runtime"
 	"strings"
 )
@@ -27,4 +29,19 @@ func Trace(message string) string {
 		str.WriteString(fmt.Sprintf("\n\t%s:%d", file, line))
 	}
 	return str.String()
+}
+
+// PanicToErr extract panic from goroutine
+// and wrap it to input error
+//	see usage in `trace_test.go`
+func PanicToErr(err *error) {
+	// extract panic
+	if e := recover(); e != nil {
+		message := fmt.Sprintf("Panic Recovered from: %s", e)
+		log.Println(Trace(message))
+		// wrap panic info to input error
+		if err != nil {
+			*err = errors.New(message)
+		}
+	}
 }
