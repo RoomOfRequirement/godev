@@ -16,13 +16,8 @@ type FdLock struct {
 func NewFdLock(fd int) (*FdLock, error) {
 	// check validation by trying get file lock
 	if err := syscall.FcntlFlock(uintptr(fd), syscall.F_GETFL, &syscall.Flock_t{
-		Type:      syscall.F_WRLCK,
-		Whence:    io.SeekStart,
-		Pad_cgo_0: [4]byte{},
-		Start:     0,
-		Len:       0,
-		Pid:       0,
-		Pad_cgo_1: [4]byte{},
+		Type:   syscall.F_WRLCK,
+		Whence: io.SeekStart,
 	}); err != nil {
 		return nil, err
 	}
