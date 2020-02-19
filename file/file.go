@@ -2,7 +2,10 @@
 package file
 
 import (
+	"errors"
 	"fmt"
+	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -86,4 +89,98 @@ func Walk(root string, walkFunc func(path string) error, skipPattern string) err
 		}
 		return walkFunc(path)
 	})
+}
+
+// CopyFile copies src file to dst and keeps the file mode
+func CopyFile(srcPath, dstPath string) error {
+	srcInfo, err := os.Stat(srcPath)
+	if err != nil {
+		return err
+	}
+	if srcInfo.IsDir() {
+		return errors.New("src is a dir, not a file")
+	}
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return err
+	}
+	return os.Chmod(dstPath, srcInfo.Mode())
+}
+
+// CopyDir copies src dir to dst and keeps file mode
+func CopyDir(srcPath, dstPath string) error {
+	srcInfo, err := os.Stat(srcPath)
+	if err != nil {
+		return err
+	}
+	// not dir
+	if !srcInfo.IsDir() {
+		return errors.New("src is not a dir")
+	}
+	// create dst dir
+	err = os.MkdirAll(dstPath, srcInfo.Mode())
+	if err != nil {
+		return err
+	}
+
+	srcDir, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer srcDir.Close()
+
+	// get all FileInfo (-1)
+	fis, err := srcDir.Readdir(-1)
+	if err != nil {
+		return err
+	}
+
+	for _, fi := range fis {
+		fp := filepath.Join(srcPath, fi.Name())
+		dfp := filepath.Join(dstPath, fi.Name())
+		// sub-dirs, handled recursively
+		if fi.IsDir() {
+			err = CopyDir(fp, dfp)
+		} else {
+			err = CopyFile(fp, dfp)
+		}
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+	}
+	return nil
+}
+
+// IsWritable ...
+func IsWritable(filepath string) (bool, error) {
+	file, err := os.OpenFile(filepath, os.O_WRONLY, 0666)
+	if err != nil {
+		if os.IsPermission(err) {
+			return false, err
+		}
+	}
+	defer file.Close()
+	return true, nil
+
+}
+
+// SetWritable ...
+func SetWritable(filepath string) error {
+	return os.Chmod(filepath, 0222)
+}
+
+// SetReadOnly ...
+func SetReadOnly(filepath string) error {
+	return os.Chmod(filepath, 0444)
 }

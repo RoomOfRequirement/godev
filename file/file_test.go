@@ -90,3 +90,73 @@ func TestWalk(t *testing.T) {
 	err = Remove("./tmp")
 	assert.NoError(t, err)
 }
+
+func TestCopy(t *testing.T) {
+	dir, file := "./tmp/", "./tmp/tmp.txt"
+	err := Create(file)
+	assert.NoError(t, err)
+	subFile := dir + "sub/sub.txt"
+	err = Create(subFile)
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+
+	copyDir := "./copy/"
+	err = CreateDir(copyDir)
+	assert.NoError(t, err)
+	defer os.RemoveAll(copyDir)
+	err = CopyFile(file, copyDir+"dup.txt")
+	assert.NoError(t, err)
+	err = CopyDir(dir, copyDir)
+	assert.NoError(t, err)
+
+	// err file
+	err = CopyFile("", copyDir)
+	assert.Error(t, err)
+	err = CopyFile(file, copyDir)
+	assert.Error(t, err)
+	err = CopyFile(dir, copyDir)
+	assert.Error(t, err)
+	// read-only file
+	rofp := dir + "ro.txt"
+	f, err := os.Create(rofp)
+	assert.NoError(t, err)
+	err = f.Chmod(0444)
+	assert.NoError(t, err)
+	err = CopyFile(rofp, copyDir+"dupro.txt")
+	assert.NoError(t, err)
+
+	// err dir
+	err = CopyDir("", copyDir)
+	assert.Error(t, err)
+	err = CopyDir(file, copyDir)
+	assert.Error(t, err)
+	// read-only file
+	err = CopyDir(dir, copyDir)
+	assert.NoError(t, err)
+	// read-only dir
+	rodir := "ro"
+	err = os.Mkdir(rodir, 0444)
+	assert.NoError(t, err)
+	defer os.RemoveAll(rodir)
+	err = CopyDir(dir, rodir)
+	assert.Error(t, err)
+}
+
+func TestReadWrite(t *testing.T) {
+	dir, file := "./tmp/", "./tmp/tmp.txt"
+	err := Create(file)
+	assert.NoError(t, err)
+	defer os.RemoveAll(dir)
+	isWritable, err := IsWritable(file)
+	assert.True(t, isWritable)
+	assert.NoError(t, err)
+	err = SetReadOnly(file)
+	assert.NoError(t, err)
+	isWritable, err = IsWritable(file)
+	assert.False(t, isWritable)
+	assert.Error(t, err) // permission denied
+	err = SetWritable(file)
+	isWritable, err = IsWritable(file)
+	assert.True(t, isWritable)
+	assert.NoError(t, err)
+}
