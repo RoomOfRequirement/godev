@@ -8,6 +8,8 @@ const host64bit = ^uint(0)>>64 == 0
 const intSize = 32 << (^uint(0) >> 63)
 const shiftToSign = intSize - 1
 
+// const maxInt = int(^uint(0)>>1)
+
 // Sign returns 1 for positive, -1 for negative and 0 for 0
 func Sign(x int) int {
 	if x == 0 {
@@ -196,4 +198,17 @@ func CountBitsZeroTailing(x uint) int {
 		return c
 	}
 	panic("arch not support")
+}
+
+// IsOdd ...
+func IsOdd(x int) bool {
+	// or `x % 2 != 0`, they almost have the same performance,
+	// see benchmark in `bitopes_test.go`
+	// see compiler explorer: https://gcc.godbolt.org/#g:!((g:!((g:!((h:codeEditor,i:(j:1,options:(compileOnChange:'0'),source:'int+isOdd_mod(unsigned+x)+%7B%0A++++return+(x+%25+2)%3B%0A%7D%0A%0Aint+isOdd_and(unsigned+x)+%7B%0A++++return+(x+%26+1)%3B%0A%7D%0A%0Aint+isOdd_or(unsigned+x)+%7B%0A++++return+(0xFFFFFFFF+%3D%3D+(x+%7C+0xFFFFFFFE))%3B%0A%7D+++'),l:'5',n:'1',o:'C%2B%2B+source+%231',t:'0')),k:33.333333333333336,l:'4',n:'0',o:'',s:0,t:'0'),(g:!((h:compiler,i:(compiler:clang390,filters:(b:'0',commentOnly:'0',directives:'0',intel:'0'),options:'-O3'),l:'5',n:'0',o:'%231+with+x86-64+clang+3.9.0',t:'0')),k:33.333333333333336,l:'4',n:'0',o:'',s:0,t:'0'),(g:!((h:compiler,i:(compiler:g62,filters:(b:'0',commentOnly:'0',directives:'0',intel:'0'),options:'-O3'),l:'5',n:'0',o:'%231+with+x86-64+gcc+6.2',t:'0')),k:33.33333333333333,l:'4',n:'0',o:'',s:0,t:'0')),l:'2',n:'0',o:'',t:'0')),version:4
+	return (x & 1) == 1
+}
+
+// IsEven ...
+func IsEven(x int) bool {
+	return (x & 1) == 0
 }

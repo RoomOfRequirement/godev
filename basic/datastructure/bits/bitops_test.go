@@ -121,3 +121,48 @@ func TestCountBitsZeroTailing(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestIsOdd(t *testing.T) {
+	if IsOdd(1) != true || IsOdd(-1) != true || IsOdd(2) != false {
+		t.Fail()
+	}
+}
+
+func TestIsEven(t *testing.T) {
+	if IsEven(1) != false || IsEven(-1) != false || IsEven(2) != true {
+		t.Fail()
+	}
+}
+
+func BenchmarkIsOdd(b *testing.B) {
+	f1 := func(x int) bool {
+		return (x & 1) == 1
+	}
+	f2 := func(x int) bool {
+		return x%2 != 0
+	}
+	f3 := func(x int) bool {
+		return int(^uint(0)>>1) == (x | (int(^uint(0)>>1) - 1))
+	}
+	b.Run("IsOdd and ops", func(b *testing.B) {
+		b.ReportAllocs()
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = f1(i)
+		}
+	})
+	b.Run("IsOdd modulo ops", func(b *testing.B) {
+		b.ReportAllocs()
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = f2(i)
+		}
+	})
+	b.Run("IsOdd or ops", func(b *testing.B) {
+		b.ReportAllocs()
+		b.StartTimer()
+		for i := 0; i < b.N; i++ {
+			_ = f3(i)
+		}
+	})
+}
