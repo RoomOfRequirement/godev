@@ -85,7 +85,7 @@ func (bf *BloomFilter) Clear() {
 // Values returns bit-set in string
 func (bf *BloomFilter) Values() []interface{} {
 	s := make([]interface{}, bf.Size())
-	for i := 0; i < bf.Size() >> 6; i++ {
+	for i := 0; i < bf.Size()>>6; i++ {
 		s[i] = strconv.FormatInt(bf.bits[i], 2)
 	}
 	return s
