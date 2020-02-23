@@ -70,7 +70,7 @@ func NewSnowflake(options SnowFlakeOptions) (*SnowFlake, error) {
 	if options.StartTime.IsZero() {
 		sf.startTime = DefaultStartTime
 	} else {
-		sf.startTime = timeToUint64(options.StartTime)
+		sf.startTime = timeToInt64(options.StartTime)
 	}
 	return &sf, nil
 }
@@ -79,7 +79,7 @@ func NewSnowflake(options SnowFlakeOptions) (*SnowFlake, error) {
 func (sf *SnowFlake) NextUID() (uint64, error) {
 	sf.Lock()
 	defer sf.Unlock()
-	current := timeToUint64(time.Now()) - sf.startTime
+	current := timeToInt64(time.Now()) - sf.startTime
 	// first sequence
 	if sf.elapsedTime < current {
 		sf.elapsedTime = current
@@ -102,6 +102,6 @@ func (sf *SnowFlake) NextUID() (uint64, error) {
 	return uint64(sf.elapsedTime<<(MachineIDBits+SequenceBits)) | uint64(sf.machineID<<MachineIDBits) | uint64(sf.sequence), nil
 }
 
-func timeToUint64(t time.Time) int64 {
+func timeToInt64(t time.Time) int64 {
 	return t.UTC().UnixNano() / int64(time.Millisecond)
 }

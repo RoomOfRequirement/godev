@@ -55,7 +55,7 @@ func TestNewSnowflake(t *testing.T) {
 	})
 	assert.NotNil(t, sf)
 	assert.NoError(t, err)
-	assert.Equal(t, timeToUint64(st), sf.startTime)
+	assert.Equal(t, timeToInt64(st), sf.startTime)
 	assert.Equal(t, uint16(0), sf.machineID)
 }
 
