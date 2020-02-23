@@ -3,7 +3,6 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"log"
 	"runtime"
 	"strings"
 )
@@ -38,10 +37,10 @@ func PanicToErr(err *error) {
 	// extract panic
 	if e := recover(); e != nil {
 		message := fmt.Sprintf("Panic Recovered from: %s", e)
-		log.Println(Trace(message))
+		// log.Println(Trace(message))
 		// wrap panic info to input error
 		if err != nil {
-			*err = errors.New(message)
+			*err = errors.New(Trace(message))
 		}
 	}
 }

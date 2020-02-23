@@ -3,6 +3,7 @@ package cron
 import (
 	"errors"
 	"go.uber.org/zap"
+	"godev/controlflow/logger"
 	"sort"
 	"sync"
 	"sync/atomic"
@@ -16,7 +17,7 @@ func New() Cron {
 		jobID:         0,
 		newJobChan:    make(chan *internalJob, 1),
 		removeJobChan: make(chan int, 1),
-		logger:        NewLogger("info"),
+		logger:        logger.NewLogger("info"),
 		stopOnce:      sync.Once{},
 		stopChan:      make(chan struct{}),
 		stopped:       1, // need call Start() method to start
