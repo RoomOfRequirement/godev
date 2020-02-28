@@ -12,6 +12,12 @@ func TestIsPrivateIPv4(t *testing.T) {
 	assert.True(t, IsPrivateIPv4([]byte{192, 168, 1, 1}))
 }
 
+func TestGetPublicIP(t *testing.T) {
+	ip, err := GetPublicIP()
+	assert.NoError(t, err)
+	assert.NotNil(t, ip)
+}
+
 func TestGetLocalIP(t *testing.T) {
 	_, err := GetLocalIP(true)
 	assert.NoError(t, err)

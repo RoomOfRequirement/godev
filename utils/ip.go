@@ -4,8 +4,11 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"math/big"
 	"net"
+	"net/http"
+	"strings"
 )
 
 // IsPrivateIPv4 ...
@@ -15,6 +18,20 @@ func IsPrivateIPv4(ip net.IP) bool {
 		(ip[0] == 10 ||
 			ip[0] == 172 && (ip[1] >= 16 && ip[1] < 32) ||
 			ip[0] == 192 && ip[1] == 168)
+}
+
+// GetPublicIP ...
+func GetPublicIP() (net.IP, error) {
+	resp, err := http.Get("http://myexternalip.com/raw")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return net.ParseIP(strings.TrimSpace(string(content))), nil
 }
 
 // GetLocalIP ...
