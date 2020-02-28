@@ -44,3 +44,14 @@ func PanicToErr(err *error) {
 		}
 	}
 }
+
+// Fallback returns fallback if orig func panic
+func Fallback(orig func() interface{}, fallback interface{}) (ret interface{}) {
+	defer func() {
+		if recover() != nil {
+			ret = fallback
+		}
+	}()
+	ret = orig()
+	return
+}

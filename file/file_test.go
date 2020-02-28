@@ -160,3 +160,37 @@ func TestReadWrite(t *testing.T) {
 	assert.True(t, isWritable)
 	assert.NoError(t, err)
 }
+
+func TestDirSize(t *testing.T) {
+	ds, err := SizeDir(".")
+	assert.NoError(t, err)
+	assert.True(t, ds > 0)
+
+	ds, err = SizeDir("./not-exist")
+	assert.Error(t, err)
+	assert.True(t, ds == 0)
+}
+
+func TestFileSize(t *testing.T) {
+	fs, err := SizeFile("./file.go")
+	assert.NoError(t, err)
+	assert.True(t, fs > 0)
+
+	fs, err = SizeFile("./not-exist")
+	assert.Error(t, err)
+	assert.True(t, fs == 0)
+}
+
+func TestSize(t *testing.T) {
+	sz, err := Size("./file.go")
+	assert.NoError(t, err)
+	assert.True(t, sz > 0)
+
+	sz, err = Size(".")
+	assert.NoError(t, err)
+	assert.True(t, sz > 0)
+
+	sz, err = Size("./not-exist")
+	assert.Error(t, err)
+	assert.True(t, sz == 0)
+}

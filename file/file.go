@@ -184,3 +184,39 @@ func SetWritable(filepath string) error {
 func SetReadOnly(filepath string) error {
 	return os.Chmod(filepath, 0444)
 }
+
+// SizeDir in bytes
+func SizeDir(path string) (int64, error) {
+	var size int64
+	err := filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("fail to access path %q: %v", p, err)
+		}
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return nil
+	})
+	return size, err
+}
+
+// SizeFile in bytes
+func SizeFile(path string) (int64, error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return 0, fmt.Errorf("fail to access path %q: %v", path, err)
+	}
+	return fi.Size(), nil
+}
+
+// Size in bytes
+func Size(path string) (int64, error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return 0, fmt.Errorf("fail to access path %q: %v", path, err)
+	}
+	if fi.IsDir() {
+		return SizeDir(path)
+	}
+	return fi.Size(), nil
+}

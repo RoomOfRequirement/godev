@@ -40,3 +40,16 @@ func TestPanicToErr(t *testing.T) {
 	assert.Error(t, err)
 	t.Log(err)
 }
+
+func TestFallback(t *testing.T) {
+	ret := Fallback(func() interface{} {
+		return nil
+	}, "error")
+	assert.Nil(t, ret)
+
+	ret = Fallback(func() interface{} {
+		panic("hi, panic here, need help")
+		return nil
+	}, "panic occurs but recovered by me")
+	assert.Equal(t, "panic occurs but recovered by me", ret.(string))
+}
