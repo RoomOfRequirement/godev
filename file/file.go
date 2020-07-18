@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -219,4 +220,29 @@ func Size(path string) (int64, error) {
 		return SizeDir(path)
 	}
 	return fi.Size(), nil
+}
+
+// WriteFileAtomic writes data into file atomically
+func WriteFileAtomic(path string, data []byte, mode os.FileMode) error {
+	dir, name := filepath.Dir(path), filepath.Base(path)
+	f, err := ioutil.TempFile(dir, name)
+	if err != nil {
+		return err
+	}
+	n, err := f.Write(data)
+	if err != nil {
+		_ = os.Remove(f.Name())
+		return err
+	}
+	_ = f.Close()
+	if n < len(data) {
+		err = io.ErrShortWrite
+	} else {
+		err = os.Chmod(f.Name(), mode)
+	}
+	if err != nil {
+		_ = os.Remove(f.Name())
+		return err
+	}
+	return os.Rename(f.Name(), path)
 }

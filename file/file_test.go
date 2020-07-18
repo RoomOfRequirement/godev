@@ -194,3 +194,31 @@ func TestSize(t *testing.T) {
 	assert.Error(t, err)
 	assert.True(t, sz == 0)
 }
+
+func TestWriteFileAtomic(t *testing.T) {
+	data := []byte("abcdefg")
+	err := WriteFileAtomic("./tmp/notexist", data, os.ModePerm)
+	assert.Error(t, err)
+
+	dir, file := "./tmp/", "./tmp/tmp.txt"
+	assert.False(t, IsExist(file))
+	assert.False(t, IsDir(dir))
+	assert.False(t, IsFile(file))
+	err = os.MkdirAll(dir, os.ModePerm)
+	assert.NoError(t, err)
+	f, err := os.Create(file)
+	assert.NoError(t, err)
+	defer func() {
+		f.Close()
+		os.RemoveAll(dir)
+	}()
+	err = WriteFileAtomic(file, data, os.ModePerm)
+	assert.NoError(t, err)
+	err = WriteFileAtomic("./tmp/noexist.txt", data, os.ModePerm)
+	assert.NoError(t, err)
+
+	err = SetReadOnly(file)
+	assert.NoError(t, err)
+	err = WriteFileAtomic(file, data, os.ModePerm)
+	assert.NoError(t, err)
+}
