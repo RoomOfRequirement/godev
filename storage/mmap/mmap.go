@@ -43,60 +43,74 @@ type MMap struct {
 }
 
 // New ...
-func New(filename string, prot, flags int, offset int64) (*MMap, error) {
+func New(filename string, size int, prot, flags int, offset int64) (*MMap, error) {
+	if size == 0 {
+		return nil, fmt.Errorf("mmap: can NOT map region size == 0")
+	}
 	if offset%int64(os.Getpagesize()) != 0 {
 		return nil, fmt.Errorf("mmap: offset must be a multiple of os pagesize")
 	}
-	f, err := os.Open(filename)
-	if err != nil {
-		return nil, err
+	sysProt := syscall.PROT_READ
+	sysFlags := syscall.MAP_SHARED
+	switch {
+	// COPY
+	case prot&COPY != 0:
+		sysProt |= syscall.PROT_WRITE
+		sysFlags = syscall.MAP_PRIVATE
+	// RDWR
+	case prot&RDWR != 0:
+		sysProt |= syscall.PROT_WRITE
+	// EXEC
+	case prot&EXEC != 0:
+		sysProt |= syscall.PROT_EXEC
 	}
-	defer f.Close()
-	fi, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
-	if size := fi.Size(); size == 0 {
-		return &MMap{}, nil
-	} else if size != int64(int(size)) {
-		// golang int is 64-bit on x64, 32-bit on x86 (like size_t)
-		// so on 32-bit system, file > 2GB is not able to be mmap-ed
-		return nil, fmt.Errorf("mmap: file %q size too large", filename)
+	var data []byte
+	var err error
+
+	// anonymous mapping, no file required, so ignore filename
+	if flags&ANON != 0 {
+		sysFlags |= syscall.MAP_ANON
+		data, err = syscall.Mmap(-1, offset, size, sysProt, sysFlags)
 	} else {
-		sysProt := syscall.PROT_READ
-		sysFlags := syscall.MAP_SHARED
-		switch {
-		// COPY
-		case prot&COPY != 0:
-			sysProt |= syscall.PROT_WRITE
-			sysFlags = syscall.MAP_PRIVATE
-		// RDWR
-		case prot&RDWR != 0:
-			sysProt |= syscall.PROT_WRITE
-		// EXEC
-		case prot&EXEC != 0:
-			sysProt |= syscall.PROT_EXEC
-		}
-		var data []byte
-		if flags&ANON != 0 {
-			sysFlags |= syscall.MAP_ANON
-			data, err = syscall.Mmap(-1, offset, int(size), sysProt, sysFlags)
-		} else {
-			data, err = syscall.Mmap(int(f.Fd()), offset, int(size), sysProt, sysFlags)
-		}
+		// open or create
+		f, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0666)
 		if err != nil {
 			return nil, err
 		}
-		// register finalizer to avoid fd leak when forget to close mmap
-		m := &MMap{
-			data: data,
+		defer f.Close()
+		fi, err := f.Stat()
+		if err != nil {
+			return nil, err
 		}
-		runtime.SetFinalizer(m, (*MMap).Close)
-		return m, nil
+		fSize := fi.Size()
+		// golang int is 64-bit on x64, 32-bit on x86 (like size_t)
+		// so on 32-bit system, file > 2GB is not able to be mmap-ed
+		if fSize != int64(int(fSize)) {
+			return nil, fmt.Errorf("mmap: file %q size too large", filename)
+		}
+		if fSize < int64(size) {
+			err = f.Truncate(int64(size))
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			data, err = syscall.Mmap(int(f.Fd()), offset, size, sysProt, sysFlags)
+		}
 	}
+
+	if err != nil {
+		return nil, err
+	}
+	// register finalizer to avoid fd leak when forget to close mmap
+	m := &MMap{
+		data: data,
+	}
+	runtime.SetFinalizer(m, (*MMap).Close)
+	return m, nil
 }
 
 // Close ...
+// io.Closer interface: https://golang.org/pkg/io/#Closer
 func (m *MMap) Close() error {
 	if m.data == nil {
 		return nil
@@ -106,17 +120,6 @@ func (m *MMap) Close() error {
 	// no need for a finalizer anymore
 	runtime.SetFinalizer(m, nil)
 	return syscall.Munmap(data)
-}
-
-// Lock ...
-// https://man7.org/linux/man-pages/man2/mlock.2.html
-func (m *MMap) Lock() error {
-	return syscall.Mlock(m.data)
-}
-
-// Unlock ...
-func (m *MMap) Unlock() error {
-	return syscall.Munlock(m.data)
 }
 
 // Len ...
@@ -131,16 +134,33 @@ func (m *MMap) At(i int) byte {
 
 // ReadAt ...
 // io.ReadAt interface: https://golang.org/pkg/io/#ReaderAt
-func (m *MMap) ReadAt(p []byte, off int64) (int, error) {
+func (m *MMap) ReadAt(p []byte, off int64) (n int, err error) {
 	if m.data == nil {
 		return 0, fmt.Errorf("mmap: closed")
 	}
 	if off < 0 || off > int64(len(m.data)) {
 		return 0, fmt.Errorf("mmap: invalid ReadAt offset: %d", off)
 	}
-	n := copy(p, m.data[off:])
+	n = copy(p, m.data[off:])
 	if n < len(p) {
 		return n, io.EOF
+	}
+	return n, nil
+}
+
+// WriteAt ...
+// io.WriteAt interface: https://golang.org/pkg/io/#WriteAt
+// notice: only available when mmap prot >= RDWR, otherwise it will panic
+func (m *MMap) WriteAt(p []byte, off int64) (n int, err error) {
+	if m.data == nil {
+		return 0, fmt.Errorf("mmap: closed")
+	}
+	if off < 0 || off > int64(len(m.data)) {
+		return 0, fmt.Errorf("mmap: invalid WriteAt offset: %d", off)
+	}
+	n = copy(m.data[off:], p)
+	if n < len(p) {
+		return n, io.ErrShortWrite
 	}
 	return n, nil
 }
